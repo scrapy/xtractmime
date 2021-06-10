@@ -21,7 +21,7 @@ def _get_resource_metadata(body, ContentType, http_origin):
 
 
 #main function
-def xtractmime(body, ContentType, http_origin, NoSniff):
+def xtractmime(body: bytes, content_type: List[Union[str, bytes]], http_origin: bool, no_sniff: bool) -> str:
     supplied_type = _get_resource_metadata(body, ContentType, http_origin)
 
     pass
