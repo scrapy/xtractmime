@@ -4,8 +4,6 @@ _APACHE_TYPES = ["text/plain", "text/plain; charset=ISO-8859-1",
                 "text/plain; charset=iso-8859-1", 
                 "text/plain; charset=UTF-8"]
 
-check_for_apache = False
-
 #handling resource metadata
 def _get_resource_metadata(content_types, http_origin):
     if http_origin:
