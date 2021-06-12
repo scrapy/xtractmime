@@ -1,0 +1,38 @@
+action: GLOB, msg: packaging
+cwd: /Users/akshaysharma/Desktop/git/xtractmime
+cmd: /usr/local/opt/python@3.7/bin/python3.7 setup.py sdist --formats=zip --dist-dir .tox/dist
+running sdist
+running egg_info
+writing xtractmime.egg-info/PKG-INFO
+writing dependency_links to xtractmime.egg-info/dependency_links.txt
+writing top-level names to xtractmime.egg-info/top_level.txt
+package init file 'xtractmime/__init__.py' not found (or not a regular file)
+reading manifest file 'xtractmime.egg-info/SOURCES.txt'
+writing manifest file 'xtractmime.egg-info/SOURCES.txt'
+running check
+creating xtractmime-1.0.0
+creating xtractmime-1.0.0/xtractmime
+creating xtractmime-1.0.0/xtractmime.egg-info
+copying files to xtractmime-1.0.0...
+copying README.md -> xtractmime-1.0.0
+copying setup.py -> xtractmime-1.0.0
+copying xtractmime/main.py -> xtractmime-1.0.0/xtractmime
+copying xtractmime.egg-info/PKG-INFO -> xtractmime-1.0.0/xtractmime.egg-info
+copying xtractmime.egg-info/SOURCES.txt -> xtractmime-1.0.0/xtractmime.egg-info
+copying xtractmime.egg-info/dependency_links.txt -> xtractmime-1.0.0/xtractmime.egg-info
+copying xtractmime.egg-info/top_level.txt -> xtractmime-1.0.0/xtractmime.egg-info
+Writing xtractmime-1.0.0/setup.cfg
+creating '.tox/dist/xtractmime-1.0.0.zip' and adding 'xtractmime-1.0.0' to it
+adding 'xtractmime-1.0.0'
+adding 'xtractmime-1.0.0/xtractmime.egg-info'
+adding 'xtractmime-1.0.0/xtractmime'
+adding 'xtractmime-1.0.0/PKG-INFO'
+adding 'xtractmime-1.0.0/README.md'
+adding 'xtractmime-1.0.0/setup.py'
+adding 'xtractmime-1.0.0/setup.cfg'
+adding 'xtractmime-1.0.0/xtractmime.egg-info/PKG-INFO'
+adding 'xtractmime-1.0.0/xtractmime.egg-info/SOURCES.txt'
+adding 'xtractmime-1.0.0/xtractmime.egg-info/top_level.txt'
+adding 'xtractmime-1.0.0/xtractmime.egg-info/dependency_links.txt'
+adding 'xtractmime-1.0.0/xtractmime/main.py'
+removing 'xtractmime-1.0.0' (and everything under it)

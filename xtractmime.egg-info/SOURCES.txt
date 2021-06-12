@@ -1,0 +1,7 @@
+README.md
+setup.py
+xtractmime/main.py
+xtractmime.egg-info/PKG-INFO
+xtractmime.egg-info/SOURCES.txt
+xtractmime.egg-info/dependency_links.txt
+xtractmime.egg-info/top_level.txt
