@@ -1,0 +1,4 @@
+.mypy_cache
+.tox
+xtractmime.egg-info
+.DS_Store
