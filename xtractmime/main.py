@@ -21,12 +21,12 @@ _WHITESPACE_BYTES = [b"\t", b"\r", b"\x0c", b"\n", b" "]
 # handling resource metadata
 def _should_check_for_apache_bug(supplied_type, http_origin):
     if http_origin and (
-        supplied_type in _APACHE_TYPES_STR
-        or supplied_type in _APACHE_TYPES_BYTES
+        supplied_type in _APACHE_TYPES_STR or supplied_type in _APACHE_TYPES_BYTES
     ):
         return True
 
     return False
+
 
 # reading resource header
 def _read_resource_header(body):
@@ -39,8 +39,14 @@ def _read_resource_header(body):
 
 
 # Matching a MIME type pattern
-def _is_match_mime_pattern(input_bytes, byte_pattern, pattern_mask, lead_whitespace=None):
-    input_size, pattern_size, mask_size = len(input_bytes), len(byte_pattern), len(pattern_mask)
+def _is_match_mime_pattern(
+    input_bytes, byte_pattern, pattern_mask, lead_whitespace=None
+):
+    input_size, pattern_size, mask_size = (
+        len(input_bytes),
+        len(byte_pattern),
+        len(pattern_mask),
+    )
 
     assert pattern_size == mask_size, "pattern's length should match mask's length"
 
@@ -50,7 +56,10 @@ def _is_match_mime_pattern(input_bytes, byte_pattern, pattern_mask, lead_whitesp
     input_index, pattern_index = 0, 0
 
     if lead_whitespace:
-        while input_index < input_size and bytes([input_bytes[input_index]]) in _WHITESPACE_BYTES :
+        while (
+            input_index < input_size
+            and bytes([input_bytes[input_index]]) in _WHITESPACE_BYTES
+        ):
             input_index += 1
 
     while pattern_index < pattern_size:

@@ -1,6 +1,10 @@
 from unittest import TestCase
 
-from xtractmime.main import _should_check_for_apache_bug, _is_match_mime_pattern, _read_resource_header
+from xtractmime.main import (
+    _should_check_for_apache_bug,
+    _is_match_mime_pattern,
+    _read_resource_header,
+)
 
 
 class TestMain(TestCase):
@@ -10,10 +14,10 @@ class TestMain(TestCase):
     file.close()
 
     input_bytes = (
-            b"GIF87a@\x1fp\x17\xf7\x00\x00\x03\x05\x0c\x0b\x0e\x15\x08\x0c\x17"
-            b"\x0e\x12\x15\x0e\x12\x1b\n\x14\x1c\x11\x15\x16\x12\x15\x1c\x15"
-            b"\x19\x1d\x19\x1b\x1e\x16\x18\x18\x0e\x10\x12\x1c"
-        )
+        b"GIF87a@\x1fp\x17\xf7\x00\x00\x03\x05\x0c\x0b\x0e\x15\x08\x0c\x17"
+        b"\x0e\x12\x15\x0e\x12\x1b\n\x14\x1c\x11\x15\x16\x12\x15\x1c\x15"
+        b"\x19\x1d\x19\x1b\x1e\x16\x18\x18\x0e\x10\x12\x1c"
+    )
 
     def test_should_check_for_apache_bug(self):
         self.assertEqual(
