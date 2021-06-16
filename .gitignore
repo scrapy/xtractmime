@@ -1,4 +1,9 @@
-.mypy_cache
-.tox
-xtractmime.egg-info
+*.pyc
+.~lock*
 .DS_Store
+.mypy_cache/
+*.egg-info/
+.tox/
+.coverage
+htmlcov/
+coverage.xml
