@@ -13,11 +13,7 @@ class TestMain(TestCase):
     body = file.read()
     file.close()
 
-    input_bytes = (
-        b"GIF87a@\x1fp\x17\xf7\x00\x00\x03\x05\x0c\x0b\x0e\x15\x08\x0c\x17"
-        b"\x0e\x12\x15\x0e\x12\x1b\n\x14\x1c\x11\x15\x16\x12\x15\x1c\x15"
-        b"\x19\x1d\x19\x1b\x1e\x16\x18\x18\x0e\x10\x12\x1c"
-    )
+    input_bytes = b"GIF87a@\x1fp\x17\xf7\x00\x00"
 
     def test_should_check_for_apache_bug(self):
         self.assertEqual(
@@ -47,7 +43,6 @@ class TestMain(TestCase):
                 input_bytes=self.input_bytes,
                 byte_pattern=b"GIF87a",
                 pattern_mask=b"\xff\xff\xff\xff\xff\xff",
-                lead_whitespace=1,
             ),
             True,
         )
@@ -65,7 +60,6 @@ class TestMain(TestCase):
                 input_bytes=b"GIF",
                 byte_pattern=b"GIF87a",
                 pattern_mask=b"\xff\xff\xff\xff\xff\xff",
-                lead_whitespace=1,
             ),
             False,
         )
@@ -74,7 +68,6 @@ class TestMain(TestCase):
                 input_bytes=b"\xff\xff\xff\xff\xff\xff",
                 byte_pattern=b"GIF87a",
                 pattern_mask=b"\xff\xff\xff\xff\xff\xff",
-                lead_whitespace=1,
             ),
             False,
         )
