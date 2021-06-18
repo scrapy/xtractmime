@@ -13,7 +13,7 @@ class TestMain(TestCase):
     body = file.read()
     file.close()
 
-    input_bytes = b"GIF87a@\x1fp\x17\xf7\x00\x00"
+    input_bytes = b"GIF87a" + bytes.fromhex("401f7017f70000")
 
     def test_should_check_for_apache_bug(self):
         self.assertEqual(
