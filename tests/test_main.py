@@ -1,4 +1,5 @@
-from unittest import TestCase
+import unittest
+import pytest
 
 from xtractmime.main import (
     _should_check_for_apache_bug,
@@ -6,8 +7,10 @@ from xtractmime.main import (
     _read_resource_header,
 )
 
+from xtractmime.utils import _is_mp4_signature
 
-class TestMain(TestCase):
+
+class TestMain:
 
     file = open("tests/files/foo.pdf", "rb")
     body = file.read()
@@ -15,63 +18,26 @@ class TestMain(TestCase):
 
     input_bytes = b"GIF87a" + bytes.fromhex("401f7017f70000")
 
-    def test_should_check_for_apache_bug(self):
-        self.assertEqual(
-            _should_check_for_apache_bug(supplied_type="text/plain", http_origin=True),
-            True,
-        )
-        self.assertEqual(
-            _should_check_for_apache_bug(supplied_type="text/plain", http_origin=False),
-            False,
-        )
-        self.assertEqual(
-            _should_check_for_apache_bug(
-                supplied_type="application/pdf", http_origin=True
-            ),
-            False,
-        )
-        self.assertEqual(
-            _should_check_for_apache_bug(
-                supplied_type="application/pdf", http_origin=False
-            ),
-            False,
-        )
+    @pytest.mark.parametrize("supplied_type,http_origin,expected",[
+        ("text/plain",True,True),
+        ("text/plain",False,False),
+        ("application/pdf",True,False),
+        ("application/pdf",False,False),
+        ])
+    def test_should_check_for_apache_bug(self, supplied_type, http_origin, expected):
+        assert _should_check_for_apache_bug(supplied_type=supplied_type, http_origin=http_origin) == expected
 
-    def test_is_match_mime_pattern(self):
-        self.assertEqual(
-            _is_match_mime_pattern(
-                input_bytes=self.input_bytes,
-                byte_pattern=b"GIF87a",
-                pattern_mask=b"\xff\xff\xff\xff\xff\xff",
-            ),
-            True,
-        )
-        self.assertEqual(
-            _is_match_mime_pattern(
-                input_bytes=b" \t\n\rGIF87a",
-                byte_pattern=b"GIF87a",
-                pattern_mask=b"\xff\xff\xff\xff\xff\xff",
-                lead_whitespace=1,
-            ),
-            True,
-        )
-        self.assertEqual(
-            _is_match_mime_pattern(
-                input_bytes=b"GIF",
-                byte_pattern=b"GIF87a",
-                pattern_mask=b"\xff\xff\xff\xff\xff\xff",
-            ),
-            False,
-        )
-        self.assertEqual(
-            _is_match_mime_pattern(
-                input_bytes=b"\xff\xff\xff\xff\xff\xff",
-                byte_pattern=b"GIF87a",
-                pattern_mask=b"\xff\xff\xff\xff\xff\xff",
-            ),
-            False,
-        )
+    
+    @pytest.mark.parametrize("input_bytes,byte_pattern,pattern_mask,whitespace,expected",[
+        (input_bytes,b"GIF87a",b"\xff\xff\xff\xff\xff\xff",None,True),
+        (b" \t\n\rGIF87a",b"GIF87a",b"\xff\xff\xff\xff\xff\xff",True,True),
+        (b"GIF",b"GIF87a",b"\xff\xff\xff\xff\xff\xff",None,False),
+        (b"\xff\xff\xff\xff\xff\xff",b"GIF87a",b"\xff\xff\xff\xff\xff\xff",None,False),
+        ])
+    def test_is_match_mime_pattern(self, input_bytes, byte_pattern, pattern_mask, whitespace, expected):
+        assert _is_match_mime_pattern(input_bytes=input_bytes,byte_pattern=byte_pattern,pattern_mask=pattern_mask, lead_whitespace = whitespace) == expected
 
-    def test_read_resource_header(self):
-        self.assertEqual(_read_resource_header(body=self.body), self.body[:1445])
-        self.assertEqual(_read_resource_header(body=self.input_bytes), self.input_bytes)
+        
+    @pytest.mark.parametrize("body,expected",[(body,body[:1445]),(input_bytes,input_bytes)])
+    def test_read_resource_header(self, body, expected):
+        assert _read_resource_header(body=body) == expected

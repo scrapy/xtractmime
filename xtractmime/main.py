@@ -15,7 +15,7 @@ _APACHE_TYPES_BYTES = [
 ]
 
 
-_WHITESPACE_BYTES = [b"\t", b"\r", b"\x0c", b"\n", b" "]
+_WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
 
 
 # handling resource metadata

@@ -1,7 +1,7 @@
 from setuptools import setup
 
 
-with open("README.md", "r") as desc:
+with open("README.md", "r", encoding="utf-8") as desc:
     long_description = desc.read()
 
 
