@@ -1,17 +1,10 @@
-from typing import List, Union
+from typing import List, Union, Tuple
 
-_APACHE_TYPES_STR = [
-    "text/plain",
-    "text/plain; charset=ISO-8859-1",
-    "text/plain; charset=iso-8859-1",
-    "text/plain; charset=UTF-8",
-]
-
-_APACHE_TYPES_BYTES = [
-    "746578742f706c61696e",
-    "746578742f706c61696e3b20636861727365743d49534f2d383835392d31",
-    "746578742f706c61696e3b20636861727365743d69736f2d383835392d31",
-    "746578742f706c61696e3b20636861727365743d5554462d38",
+_APACHE_TYPES = [
+    b"text/plain",
+    b"text/plain; charset=ISO-8859-1",
+    b"text/plain; charset=iso-8859-1",
+    b"text/plain; charset=UTF-8",
 ]
 
 
@@ -21,7 +14,7 @@ _WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
 # handling resource metadata
 def _should_check_for_apache_bug(supplied_type, http_origin):
     if http_origin and (
-        supplied_type in _APACHE_TYPES_STR or supplied_type in _APACHE_TYPES_BYTES
+        supplied_type in _APACHE_TYPES
     ):
         return True
 
@@ -30,12 +23,12 @@ def _should_check_for_apache_bug(supplied_type, http_origin):
 
 # reading resource header
 def _read_resource_header(body):
-    buffer = b""
+    buffer = memoryview(body)
     if len(body) < 1445:
-        buffer = body
+        return buffer
     else:
-        buffer = body[:1445]
-    return buffer
+        return buffer[:1445]
+    
 
 
 # Matching a MIME type pattern
@@ -48,7 +41,8 @@ def _is_match_mime_pattern(
         len(pattern_mask),
     )
 
-    assert pattern_size == mask_size, "pattern's length should match mask's length"
+    if pattern_size != mask_size:
+        raise ValueError("pattern's length should match mask's length")
 
     if input_size < pattern_size:
         return False
@@ -76,9 +70,10 @@ def _is_match_mime_pattern(
 def extract_mime(
     body: bytes,
     *,
-    content_types: List[Union[str, bytes]] = [],
+    content_types: List[bytes] = [],
     http_origin: bool = True,
-    no_sniff: bool = False
+    no_sniff: bool = False,
+    extra_types: List[Tuple[Union[str,bytes]]] = [],
 ) -> str:
     supplied_type = None
     if content_types:
