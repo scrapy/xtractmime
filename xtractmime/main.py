@@ -47,13 +47,13 @@ def _is_match_mime_pattern(
     if lead_whitespace:
         while (
             input_index < input_size
-            and bytes([input_bytes[input_index]]) in _WHITESPACE_BYTES
+            and input_bytes[input_index:input_index+1] in _WHITESPACE_BYTES
         ):
             input_index += 1
 
     while pattern_index < pattern_size:
         masked_byte = bytes([input_bytes[input_index] & pattern_mask[pattern_index]])
-        if masked_byte != bytes([byte_pattern[pattern_index]]):
+        if masked_byte != byte_pattern[pattern_index:pattern_index+1]:
             return False
         input_index += 1
         pattern_index += 1
