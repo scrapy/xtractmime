@@ -13,12 +13,7 @@ _WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
 
 # handling resource metadata
 def _should_check_for_apache_bug(supplied_type, http_origin):
-    if http_origin and (
-        supplied_type in _APACHE_TYPES
-    ):
-        return True
-
-    return False
+    return http_origin and supplied_type in _APACHE_TYPES
 
 
 # reading resource header
