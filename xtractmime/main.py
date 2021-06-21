@@ -30,11 +30,9 @@ def _read_resource_header(body):
 def _is_match_mime_pattern(
     input_bytes, byte_pattern, pattern_mask, lead_whitespace=None
 ):
-    input_size, pattern_size, mask_size = (
-        len(input_bytes),
-        len(byte_pattern),
-        len(pattern_mask),
-    )
+    input_size = len(input_bytes)
+    pattern_size = len(byte_pattern)
+    mask_size = len(pattern_mask)
 
     if pattern_size != mask_size:
         raise ValueError("pattern's length should match mask's length")
