@@ -1,7 +1,7 @@
 import unittest
 import pytest
 
-from xtractmime.main import (
+from xtractmime.__init__ import (
     _should_check_for_apache_bug,
     _is_match_mime_pattern,
     _read_resource_header,
@@ -12,9 +12,8 @@ from xtractmime.utils import _is_mp4_signature
 
 class TestMain:
 
-    file = open("tests/files/foo.pdf", "rb")
-    body = file.read()
-    file.close()
+    with open("tests/files/foo.pdf", "rb") as fp:
+        body = fp.read()
 
     input_bytes = b"GIF87a" + bytes.fromhex("401f7017f70000")
 

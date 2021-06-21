@@ -5,13 +5,11 @@ from xtractmime.utils import _is_mp4_signature, _is_webm_signature
 
 class TestUtils:
 
-    file = open("tests/files/foo.mp4","rb")
-    body_mp4 = file.read()
-    file.close()
+    with open("tests/files/foo.mp4", "rb") as fp:
+        body_mp4 = fp.read()
 
-    file = open("tests/files/foo.webm","rb")
-    body_webm = file.read()
-    file.close()
+    with open("tests/files/foo.webm", "rb") as fp:
+        body_webm = fp.read()
 
     @pytest.mark.parametrize("input_bytes,expected",[
         (body_mp4,True),
@@ -25,6 +23,12 @@ class TestUtils:
     def test_is_mp4_signature(self, input_bytes, expected):
         assert _is_mp4_signature(input_bytes) == expected
 
-
-    def test_is_webm_signature(self):
-        assert _is_webm_signature(self.body_webm) == True
+    @pytest.mark.parametrize("input_bytes,expected",[
+        (body_webm, True),
+        (b"\x00\x00\x00",False),
+        (b"\x1aF\xdf\xa3",False),
+        (b"\x1aE\xdf\xa3B\x82",False),
+        (b"\x1aE\xdf\xa3B\x82\x00\x00\x00",False),
+        ])
+    def test_is_webm_signature(self, input_bytes, expected):
+        assert _is_webm_signature(input_bytes) == expected
