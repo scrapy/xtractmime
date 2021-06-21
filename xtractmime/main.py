@@ -75,9 +75,7 @@ def extract_mime(
     no_sniff: bool = False,
     extra_types: List[Tuple[Union[str,bytes]]] = [],
 ) -> str:
-    supplied_type = None
-    if content_types:
-        supplied_type = content_types[-1]
+    supplied_type = content_types[-1] if content_types else None
 
     check_for_apache = _should_check_for_apache_bug(supplied_type, http_origin)
     resource_header = _read_resource_header(body)
