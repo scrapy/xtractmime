@@ -20,7 +20,7 @@ def _is_mp4_signature(input_bytes):
 	while bytes_read < box_size:
 		if input_bytes[bytes_read:bytes_read+3] == b"mp4":
 			return True
-		bytes_read += 1
+		bytes_read += 4
 
 	return False
 
