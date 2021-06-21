@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name="xtractmime",
-    version="0.0.1",
+    version="0.0.0",
     url="https://github.com/scrapy/xtractmime",
     packages=["xtractmime"],
     python_requires=">=3.6",
