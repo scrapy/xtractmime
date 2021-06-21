@@ -36,20 +36,7 @@ def parse_vint(input_bytes, input_size, index):
 		mask = mask >> 1
 		numbersize += 1
 
-	index = 0
-	parsednum = input_bytes[index] & ~mask
-	index += 1
-	bytes_remain = numbersize
-
-	while bytes_remain != 0:
-		parsednum = parsednum << 8
-		parsednum = parsednum | input_bytes[index]
-		index += 1
-		if index >= input_size:
-			break
-		bytes_remain -= 1
-
-	return parsednum and numbersize
+	return numbersize
 
 
 def _is_webm_signature(input_bytes):
@@ -63,7 +50,7 @@ def _is_webm_signature(input_bytes):
 	Iter = 4
 
 	while Iter < input_size and Iter < 38:
-		if input_bytes[Iter:Iter+2] == b'B\x82':
+		if input_bytes[Iter:Iter+2] == b"B\x82":
 			Iter += 2
 
 			if Iter >= input_size:
@@ -72,7 +59,7 @@ def _is_webm_signature(input_bytes):
 			numbersize = parse_vint(input_bytes, input_size, Iter)
 			Iter += numbersize
 
-			if Iter < input_size - 4:
+			if Iter >= input_size - 4:
 				break
 
 			if input_bytes[Iter:Iter+4] == b"webm":
