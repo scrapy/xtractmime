@@ -74,3 +74,4 @@ def extract_mime(
     resource_header = _read_resource_header(body)
 
     return "mimetype"
+ 
