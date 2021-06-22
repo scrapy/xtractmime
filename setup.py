@@ -1,11 +1,11 @@
-from setuptools import setup
+import setuptools
 
 
 with open("README.md", "r", encoding="utf-8") as desc:
     long_description = desc.read()
 
 
-setup(
+setuptools.setup(
     name="xtractmime",
     version="1.0.0",
     license="BSD",

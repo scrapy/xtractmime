@@ -28,15 +28,15 @@ def _is_mp4_signature(input_bytes):
 def parse_vint(input_bytes, input_size, index):
 	mask = 128
 	max_vint_size = 8
-	numbersize = 1
+	number_size = 1
 
-	while numbersize < max_vint_size and numbersize < input_size:
+	while number_size < max_vint_size and number_size < input_size:
 		if input_bytes[index] & mask != 0:
 			break
 		mask = mask >> 1
-		numbersize += 1
+		number_size += 1
 
-	return numbersize
+	return number_size
 
 
 def _is_webm_signature(input_bytes):
@@ -47,23 +47,23 @@ def _is_webm_signature(input_bytes):
 	if input_bytes[0:4] != b"\x1aE\xdf\xa3":
 		return False
 
-	Iter = 4
+	index = 4
 
-	while Iter < input_size and Iter < 38:
-		if input_bytes[Iter:Iter+2] == b"B\x82":
-			Iter += 2
+	while index < input_size and index < 38:
+		if input_bytes[index:index+2] == b"B\x82":
+			index += 2
 
-			if Iter >= input_size:
+			if index >= input_size:
 				break
 			
-			numbersize = parse_vint(input_bytes, input_size, Iter)
-			Iter += numbersize
+			number_size = parse_vint(input_bytes, input_size, index)
+			index += number_size
 
-			if Iter >= input_size - 4:
+			if index >= input_size - 4:
 				break
 
-			if input_bytes[Iter:Iter+4] == b"webm":
+			if input_bytes[index:index+4] == b"webm":
 				return True
-		Iter += 1
+		index += 1
 
 	return False

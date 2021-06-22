@@ -1,7 +1,8 @@
 import unittest
+
 import pytest
 
-from xtractmime.__init__ import (
+from xtractmime import (
     _should_check_for_apache_bug,
     _is_match_mime_pattern,
     _read_resource_header,

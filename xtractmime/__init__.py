@@ -1,4 +1,4 @@
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Optional
 
 _APACHE_TYPES = [
     b"text/plain",
@@ -63,11 +63,13 @@ def _is_match_mime_pattern(
 def extract_mime(
     body: bytes,
     *,
-    content_types: List[bytes] = [],
+    content_types: Optional[List[bytes]] = None,
     http_origin: bool = True,
     no_sniff: bool = False,
-    extra_types: List[Tuple[Union[str,bytes]]] = [],
+    extra_types: Optional[List[Tuple[Union[str,bytes]]]] = None,
 ) -> str:
+    content_types = content_types if content_types is not None else []
+    extra_types = extra_types if extra_types is not None else []
     supplied_type = content_types[-1] if content_types else None
 
     check_for_apache = _should_check_for_apache_bug(supplied_type, http_origin)
