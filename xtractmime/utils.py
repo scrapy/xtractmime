@@ -174,14 +174,13 @@ def _mp3_framesize(version, bit_rate, freq, pad):
 
 
 def _is_mp3_non_ID3_signature(input_bytes: bytes):
-	"""This implementation does not match with standards due to various problems with the
-	algorithm according to https://github.com/whatwg/mimesniff/issues/70.
+    """This implementation does not match with standards due to various problems with the
+    algorithm according to https://github.com/whatwg/mimesniff/issues/70.
 
-	The current implementation follows 
-	https://dxr.mozilla.org/mozilla-central/source/toolkit/components/mediasniffer/mp3sniff.c
-	as the algorithm for MP3 without ID3 sniffing mentioned in standards is originally 
-	based on mp3sniff.c.
-	""" 
+    The current implementation follows
+    https://dxr.mozilla.org/mozilla-central/source/toolkit/components/mediasniffer/mp3sniff.c
+    as the algorithm for MP3 without ID3 sniffing mentioned in standards is originally
+    based on mp3sniff.c."""
     input_size = len(input_bytes)
     index = 0
 
