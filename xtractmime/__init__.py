@@ -12,7 +12,7 @@ _WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
 
 
 # handling resource metadata
-def _should_check_for_apache_bug(supplied_type, http_origin):
+def _should_check_for_apache_bug(supplied_type: Optional[bytes], http_origin: bool):
     return http_origin and supplied_type in _APACHE_TYPES
 
 
@@ -23,12 +23,11 @@ def _read_resource_header(body):
         return buffer
     else:
         return buffer[:1445]
-    
 
 
 # Matching a MIME type pattern
 def _is_match_mime_pattern(
-    input_bytes, byte_pattern, pattern_mask, lead_whitespace=None
+    input_bytes: bytes, byte_pattern: bytes, pattern_mask: bytes, lead_whitespace: bool = None
 ):
     input_size = len(input_bytes)
     pattern_size = len(byte_pattern)
@@ -45,13 +44,13 @@ def _is_match_mime_pattern(
     if lead_whitespace:
         while (
             input_index < input_size
-            and input_bytes[input_index:input_index+1] in _WHITESPACE_BYTES
+            and input_bytes[input_index : input_index + 1] in _WHITESPACE_BYTES
         ):
             input_index += 1
 
     while pattern_index < pattern_size:
         masked_byte = bytes([input_bytes[input_index] & pattern_mask[pattern_index]])
-        if masked_byte != byte_pattern[pattern_index:pattern_index+1]:
+        if masked_byte != byte_pattern[pattern_index : pattern_index + 1]:
             return False
         input_index += 1
         pattern_index += 1
@@ -66,7 +65,7 @@ def extract_mime(
     content_types: Optional[List[bytes]] = None,
     http_origin: bool = True,
     no_sniff: bool = False,
-    extra_types: Optional[List[Tuple[Union[str,bytes]]]] = None,
+    extra_types: Optional[List[Tuple[Union[str, bytes]]]] = None,
 ) -> str:
     content_types = content_types if content_types is not None else []
     extra_types = extra_types if extra_types is not None else []
@@ -76,4 +75,3 @@ def extract_mime(
     resource_header = _read_resource_header(body)
 
     return "mimetype"
- 
