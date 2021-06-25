@@ -1,4 +1,3 @@
-import unittest
 import pytest
 
 from unittest import mock
@@ -132,12 +131,12 @@ class TestUtils:
 
     def test_image(self):
         assert _is_image(self.body_gif) == "image/gif"
-        assert _is_image(b"\x00\x00\x00\x00") == None
+        assert _is_image(b"\x00\x00\x00\x00") is None
 
     def test_font(self):
         assert _is_font(self.body_ttf) == "font/ttf"
-        assert _is_font(b"\x00\x00\x00\x00") == None
+        assert _is_font(b"\x00\x00\x00\x00") is None
 
     def test_archive(self):
         assert _is_archive(self.body_zip) == "application/zip"
-        assert _is_archive(b"\x00\x00\x00\x00") == None
+        assert _is_archive(b"\x00\x00\x00\x00") is None

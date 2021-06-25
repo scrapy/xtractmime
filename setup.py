@@ -9,7 +9,8 @@ setuptools.setup(
     name="xtractmime",
     version="1.0.0",
     license="BSD",
-    description="Implementation of the MIME Sniffing standard (https://mimesniff.spec.whatwg.org/)",
+    description="""Implementation of the MIME Sniffing standard 
+                   (https://mimesniff.spec.whatwg.org/)""",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Akshay Sharma",

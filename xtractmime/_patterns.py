@@ -13,7 +13,8 @@ IMAGE_PATTERNS = (
         b"\x89PNG\r\n\x1a\n",
         b"\xff\xff\xff\xff\xff\xff\xff\xff",
         "image/png",
-    ),  # An error-checking byte followed by the string "PNG" followed by CR LF SUB LF, the PNG signature
+    ),  # An error-checking byte followed by the string "PNG" followed by CR LF SUB LF,
+    # the PNG signature
     (
         b"\xff\xd8\xff",
         b"\xff\xff\xff",
@@ -27,7 +28,8 @@ AUDIO_VIDEO_PATTERNS = (
         b"FORM\x00\x00\x00\x00AIFF",
         b"\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff",
         "audio/aiff",
-    ),  # The string "FORM" followed by four bytes followed by the string "AIFF", the AIFF signature
+    ),  # The string "FORM" followed by four bytes followed by the string "AIFF"
+    # the AIFF signature
     (b"ID3", b"\xff\xff\xff", "audio/mpeg"),  # The string "ID3", the ID3v2-tagged MP3 signature
     (
         b"OggS\x00",
@@ -38,23 +40,28 @@ AUDIO_VIDEO_PATTERNS = (
         b"MThd\x00\x00\x00\x06",
         b"\xff\xff\xff\xff\xff\xff\xff\xff",
         "audio/midi",
-    ),  # The string "MThd" followed by four bytes representing the number 6 in 32 bits (big-endian), the MIDI signature
+    ),  # The string "MThd" followed by four bytes representing the number 6 in 32 bits
+    # (big-endian), the MIDI signature
     (
         b"RIFF\x00\x00\x00\x00AVI ",
         b"\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff",
         "video/avi",
-    ),  # The string "RIFF" followed by four bytes followed by the string "AVI ", the AVI signature
+    ),  # The string "RIFF" followed by four bytes followed by the string "AVI "
+    # the AVI signature
     (
         b"RIFF\x00\x00\x00\x00WAVE",
         b"\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff",
         "audio/wave",
-    ),  # The string "RIFF" followed by four bytes followed by the string "WAVE", the WAVE signature
+    ),  # The string "RIFF" followed by four bytes followed by the string "WAVE"
+    # the WAVE signature
 )
 
 FONT_PATTERNS = (
     (
-        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00LP",
-        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff",
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00LP",
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
+        b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff",
         "application/vnd.ms-fontobject",
     ),  # 34 bytes followed by the string "LP", the Embedded OpenType signature
     (
