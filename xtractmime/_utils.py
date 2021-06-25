@@ -2,7 +2,12 @@ from struct import unpack
 from typing import Tuple, Union
 
 from xtractmime import _is_match_mime_pattern
-from xtractmime._patterns import IMAGE_PATTERNS, AUDIO_VIDEO_PATTERNS, FONT_PATTERNS, ARCHIVE_PATTERNS
+from xtractmime._patterns import (
+    IMAGE_PATTERNS,
+    AUDIO_VIDEO_PATTERNS,
+    FONT_PATTERNS,
+    ARCHIVE_PATTERNS,
+)
 
 sample_rates = [44100, 48000, 32000]
 mp25_rates = [
@@ -235,7 +240,7 @@ def _is_font(input_bytes: bytes) -> Union[str, None]:
     for pattern in FONT_PATTERNS:
         if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1]):
             return pattern[2]
-            
+
     return None
 
 
