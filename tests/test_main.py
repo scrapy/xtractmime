@@ -8,8 +8,6 @@ from xtractmime import (
     _read_resource_header,
 )
 
-from xtractmime.utils import _is_mp4_signature
-
 
 class TestMain:
 

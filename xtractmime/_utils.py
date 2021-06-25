@@ -1,4 +1,8 @@
 from struct import unpack
+from typing import Tuple, Union
+
+from xtractmime import _is_match_mime_pattern
+from xtractmime._patterns import IMAGE_PATTERNS, AUDIO_VIDEO_PATTERNS, FONT_PATTERNS, ARCHIVE_PATTERNS
 
 sample_rates = [44100, 48000, 32000]
 mp25_rates = [
@@ -37,7 +41,7 @@ mp3_rates = [
 ]
 
 
-def _is_mp4_signature(input_bytes: bytes):
+def _is_mp4_signature(input_bytes: bytes) -> bool:
     input_size = len(input_bytes)
     if input_size < 12:
         return False
@@ -62,7 +66,7 @@ def _is_mp4_signature(input_bytes: bytes):
     return False
 
 
-def _parse_vint(input_bytes: bytes, input_size: int, index: int):
+def _parse_vint(input_bytes: bytes, input_size: int, index: int) -> int:
     mask = 128
     max_vint_size = 8
     number_size = 1
@@ -76,7 +80,7 @@ def _parse_vint(input_bytes: bytes, input_size: int, index: int):
     return number_size
 
 
-def _is_webm_signature(input_bytes: bytes):
+def _is_webm_signature(input_bytes: bytes) -> bool:
     input_size = len(input_bytes)
     if input_size < 4:
         return False
@@ -106,7 +110,7 @@ def _is_webm_signature(input_bytes: bytes):
     return False
 
 
-def _match_mp3_header(input_bytes: bytes, input_size: int, index: int):
+def _match_mp3_header(input_bytes: bytes, input_size: int, index: int) -> bool:
     if input_size < 4:
         return False
 
@@ -137,7 +141,7 @@ def _match_mp3_header(input_bytes: bytes, input_size: int, index: int):
     return True
 
 
-def _parse_mp3_frame(input_bytes: bytes):
+def _parse_mp3_frame(input_bytes: bytes) -> Tuple[int, int, int, int]:
     version = (input_bytes[1] & 24) >> 3
     bit_rate_index = (input_bytes[2] & 240) >> 4
 
@@ -159,7 +163,7 @@ def _parse_mp3_frame(input_bytes: bytes):
     return version, bit_rate, freq, pad
 
 
-def _mp3_framesize(version, bit_rate, freq, pad):
+def _mp3_framesize(version, bit_rate, freq, pad) -> int:
     if (version & 1) == 0:
         scale = 72
     else:
@@ -173,7 +177,7 @@ def _mp3_framesize(version, bit_rate, freq, pad):
     return int(size)
 
 
-def _is_mp3_non_ID3_signature(input_bytes: bytes):
+def _is_mp3_non_ID3_signature(input_bytes: bytes) -> bool:
     """This implementation does not match with standards due to various problems with the
     algorithm according to https://github.com/whatwg/mimesniff/issues/70.
 
@@ -200,3 +204,44 @@ def _is_mp3_non_ID3_signature(input_bytes: bytes):
         return True
     else:
         return False
+
+
+def _is_image(input_bytes: bytes) -> Union[str, None]:
+    for pattern in IMAGE_PATTERNS:
+        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1]):
+            return pattern[2]
+
+    return None
+
+
+def _is_audio_video(input_bytes: bytes) -> Union[str, None]:
+    for pattern in AUDIO_VIDEO_PATTERNS:
+        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1]):
+            return pattern[2]
+
+    if _is_mp4_signature(input_bytes):
+        return "video/mp4"
+
+    if _is_webm_signature(input_bytes):
+        return "video/webm"
+
+    if _is_mp3_non_ID3_signature(input_bytes):
+        return "audio/mpeg"
+
+    return None
+
+
+def _is_font(input_bytes: bytes) -> Union[str, None]:
+    for pattern in FONT_PATTERNS:
+        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1]):
+            return pattern[2]
+            
+    return None
+
+
+def _is_archive(input_bytes: bytes) -> Union[str, None]:
+    for pattern in ARCHIVE_PATTERNS:
+        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1]):
+            return pattern[2]
+
+    return None

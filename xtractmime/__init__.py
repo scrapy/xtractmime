@@ -12,12 +12,12 @@ _WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
 
 
 # handling resource metadata
-def _should_check_for_apache_bug(supplied_type: Optional[bytes], http_origin: bool):
+def _should_check_for_apache_bug(supplied_type: Optional[bytes], http_origin: bool) -> bool:
     return http_origin and supplied_type in _APACHE_TYPES
 
 
 # reading resource header
-def _read_resource_header(body):
+def _read_resource_header(body: bytes) -> memoryview:
     buffer = memoryview(body)
     if len(body) < 1445:
         return buffer
@@ -28,7 +28,7 @@ def _read_resource_header(body):
 # Matching a MIME type pattern
 def _is_match_mime_pattern(
     input_bytes: bytes, byte_pattern: bytes, pattern_mask: bytes, lead_whitespace: bool = None
-):
+)-> bool:
     input_size = len(input_bytes)
     pattern_size = len(byte_pattern)
     mask_size = len(pattern_mask)
