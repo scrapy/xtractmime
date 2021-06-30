@@ -3,17 +3,17 @@ import pytest
 from unittest import mock
 
 from xtractmime._utils import (
-    _is_mp4_signature,
-    _is_webm_signature,
-    _is_mp3_non_ID3_signature,
-    _parse_vint,
-    _match_mp3_header,
-    _parse_mp3_frame,
-    _mp3_framesize,
-    _is_image,
-    _is_audio_video,
-    _is_font,
-    _is_archive,
+    is_archive,
+    is_audio_video,
+    is_font,
+    is_image,
+    is_mp3_non_ID3_signature,
+    is_mp4_signature,
+    is_webm_signature,
+    match_mp3_header,
+    mp3_framesize,
+    parse_mp3_frame,
+    parse_vint_number_size,
 )
 
 
@@ -53,7 +53,7 @@ class TestUtils:
         ],
     )
     def test_is_mp4_signature(self, input_bytes, expected):
-        assert _is_mp4_signature(input_bytes) == expected
+        assert is_mp4_signature(input_bytes) == expected
 
     @pytest.mark.parametrize(
         "input_bytes,expected",
@@ -66,11 +66,11 @@ class TestUtils:
         ],
     )
     def test_is_webm_signature(self, input_bytes, expected):
-        assert _is_webm_signature(input_bytes) == expected
+        assert is_webm_signature(input_bytes) == expected
 
-    def test_parse_vint(self):
-        assert _parse_vint(self.body_webm, len(self.body_webm), 6) == 8
-        assert _parse_vint(self.body_webm, len(self.body_webm), 30) == 1
+    def test_parse_vint_number_size(self):
+        assert parse_vint_number_size(memoryview(self.body_webm)[6:]) == 8
+        assert parse_vint_number_size(memoryview(self.body_webm)[30:]) == 1
 
     @pytest.mark.parametrize(
         "framesize,input_bytes,expected",
@@ -81,10 +81,10 @@ class TestUtils:
             (10, body_nonid3[:50], False),
         ],
     )
-    @mock.patch("xtractmime._utils._mp3_framesize")
+    @mock.patch("xtractmime._utils.mp3_framesize")
     def test_is_mp3_non_ID3_signature(self, mock_framesize, framesize, input_bytes, expected):
         mock_framesize.return_value = framesize
-        assert _is_mp3_non_ID3_signature(input_bytes) == expected
+        assert is_mp3_non_ID3_signature(input_bytes) == expected
 
     @pytest.mark.parametrize(
         "input_bytes,input_size,index,expected",
@@ -99,7 +99,7 @@ class TestUtils:
         ],
     )
     def test_match_mp3_header(self, input_bytes, input_size, index, expected):
-        assert _match_mp3_header(input_bytes, input_size, index) == expected
+        assert match_mp3_header(input_bytes, input_size, index) == expected
 
     @pytest.mark.parametrize(
         "input_bytes,expected",
@@ -110,11 +110,11 @@ class TestUtils:
         ],
     )
     def test_parse_mp3_frame(self, input_bytes, expected):
-        assert _parse_mp3_frame(input_bytes) == expected
+        assert parse_mp3_frame(input_bytes) == expected
 
     def test_mp3_framesize(self):
-        assert _mp3_framesize(1, 0, 44100, 1) == 1
-        assert _mp3_framesize(0, 0, 44100, 1) == 1
+        assert mp3_framesize(1, 0, 44100, 1) == 1
+        assert mp3_framesize(0, 0, 44100, 1) == 1
 
     @pytest.mark.parametrize(
         "input_bytes,expected",
@@ -127,16 +127,16 @@ class TestUtils:
         ],
     )
     def test_audio_video(self, input_bytes, expected):
-        assert _is_audio_video(input_bytes) == expected
+        assert is_audio_video(input_bytes) == expected
 
     def test_image(self):
-        assert _is_image(self.body_gif) == "image/gif"
-        assert _is_image(b"\x00\x00\x00\x00") is None
+        assert is_image(self.body_gif) == "image/gif"
+        assert is_image(b"\x00\x00\x00\x00") is None
 
     def test_font(self):
-        assert _is_font(self.body_ttf) == "font/ttf"
-        assert _is_font(b"\x00\x00\x00\x00") is None
+        assert is_font(self.body_ttf) == "font/ttf"
+        assert is_font(b"\x00\x00\x00\x00") is None
 
     def test_archive(self):
-        assert _is_archive(self.body_zip) == "application/zip"
-        assert _is_archive(b"\x00\x00\x00\x00") is None
+        assert is_archive(self.body_zip) == "application/zip"
+        assert is_archive(b"\x00\x00\x00\x00") is None

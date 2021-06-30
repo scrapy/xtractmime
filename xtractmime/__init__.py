@@ -1,4 +1,5 @@
-from typing import List, Union, Tuple, Optional
+__version__ = "0.0.0"
+from typing import Optional, Set, Tuple
 
 _APACHE_TYPES = [
     b"text/plain",
@@ -6,28 +7,11 @@ _APACHE_TYPES = [
     b"text/plain; charset=iso-8859-1",
     b"text/plain; charset=UTF-8",
 ]
+WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
 
 
-_WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
-
-
-# handling resource metadata
-def _should_check_for_apache_bug(supplied_type: Optional[bytes], http_origin: bool) -> bool:
-    return http_origin and supplied_type in _APACHE_TYPES
-
-
-# reading resource header
-def _read_resource_header(body: bytes) -> memoryview:
-    buffer = memoryview(body)
-    if len(body) < 1445:
-        return buffer
-    else:
-        return buffer[:1445]
-
-
-# Matching a MIME type pattern
 def _is_match_mime_pattern(
-    input_bytes: bytes, byte_pattern: bytes, pattern_mask: bytes, lead_whitespace: bool = None
+    input_bytes: bytes, byte_pattern: bytes, pattern_mask: bytes, lstrip: Set[bytes] = None
 ) -> bool:
     input_size = len(input_bytes)
     pattern_size = len(byte_pattern)
@@ -41,11 +25,8 @@ def _is_match_mime_pattern(
 
     input_index, pattern_index = 0, 0
 
-    if lead_whitespace:
-        while (
-            input_index < input_size
-            and input_bytes[input_index : input_index + 1] in _WHITESPACE_BYTES
-        ):
+    if lstrip:
+        while input_index < input_size and input_bytes[input_index : input_index + 1] in lstrip:
             input_index += 1
 
     while pattern_index < pattern_size:
@@ -58,20 +39,17 @@ def _is_match_mime_pattern(
     return True
 
 
-# main function
 def extract_mime(
     body: bytes,
     *,
-    content_types: Optional[List[bytes]] = None,
+    content_types: Optional[Tuple[bytes]] = None,
     http_origin: bool = True,
     no_sniff: bool = False,
-    extra_types: Optional[List[Tuple[Union[str, bytes]]]] = None,
+    extra_types: Optional[Tuple[Tuple[bytes, bytes, Set[bytes], str], ...]] = None,
 ) -> str:
-    content_types = content_types if content_types is not None else []
-    extra_types = extra_types if extra_types is not None else []
-    supplied_type = content_types[-1] if content_types else None
+    extra_types = extra_types or tuple()
+    # supplied_type = content_types[-1] if content_types else None
 
-    check_for_apache = _should_check_for_apache_bug(supplied_type, http_origin)
-    resource_header = _read_resource_header(body)
-
+    # check_for_apache = http_origin and supplied_type in _APACHE_TYPES
+    # resource_header = memoryview(body) if len(body) < 1445 else memoryview(body)[:1445]
     return "mimetype"
