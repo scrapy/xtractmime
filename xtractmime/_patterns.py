@@ -1,8 +1,5 @@
-"""
-Section 6.1, step 1
-https://mimesniff.spec.whatwg.org/commit-snapshots
-/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-image-type-pattern
-"""
+#: Section 6.1, step 1
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-image-type-pattern  # noqa: E501
 IMAGE_PATTERNS = (
     (b"\x00\x00\x01\x00", b"\xff\xff\xff\xff", None, "image/x-icon"),  # A Windows Icon signature
     (b"\x00\x00\x02\x00", b"\xff\xff\xff\xff", None, "image/x-icon"),  # A Windows Cursor signature
@@ -36,11 +33,8 @@ IMAGE_PATTERNS = (
     ),  # The JPEG Start of Image marker followed by the indicator byte of another marker
 )
 
-"""
-Section 6.2, step 1
-https://mimesniff.spec.whatwg.org/commit-snapshots
-/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-audio-or-video-type-pattern
-"""
+#: Section 6.2, step 1
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-audio-or-video-type-pattern  # noqa: E501
 AUDIO_VIDEO_PATTERNS = (
     (
         b".snd",
@@ -89,11 +83,8 @@ AUDIO_VIDEO_PATTERNS = (
     ),
 )
 
-"""
-Section 6.3, step 1
-https://mimesniff.spec.whatwg.org/commit-snapshots
-/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-a-font-type-pattern
-"""
+#: Section 6.3, step 1
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-a-font-type-pattern  # noqa: E501
 FONT_PATTERNS = (
     (
         (
@@ -134,11 +125,8 @@ FONT_PATTERNS = (
     ),  # The string "wOF2", the Web Open Font Format 2.0 signature
 )
 
-"""
-Section 6.4, step 1
-https://mimesniff.spec.whatwg.org/commit-snapshots
-/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-archive-type-pattern
-"""
+#: Section 6.4, step 1
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-archive-type-pattern  # noqa: E501
 ARCHIVE_PATTERNS = (
     (b"\x1f\x8b\x08", b"\xff\xff\xff", None, "application/x-gzip"),  # The GZIP archive signature
     (

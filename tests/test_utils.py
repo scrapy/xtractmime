@@ -19,17 +19,8 @@ from xtractmime._utils import (
 
 class TestUtils:
 
-    with open("tests/files/foo.mp4", "rb") as fp:
-        body_mp4 = fp.read()
-
     with open("tests/files/foo.webm", "rb") as fp:
         body_webm = fp.read()
-
-    with open("tests/files/foo.mp3", "rb") as fp:
-        body_mp3 = fp.read()
-
-    with open("tests/files/NonID3.mp3", "rb") as fp:
-        body_nonid3 = fp.read()
 
     with open("tests/files/foo.ttf", "rb") as fp:
         body_ttf = fp.read()
@@ -43,7 +34,7 @@ class TestUtils:
     @pytest.mark.parametrize(
         "input_bytes,expected",
         [
-            (body_mp4, True),
+            ("foo.mp4", True),
             (b"\x00\x00\x00", False),
             (b"\x00\x00\x00 ftypmp4", False),
             (b"\x00\x00\x00 ftypmp42", False),
@@ -53,12 +44,15 @@ class TestUtils:
         ],
     )
     def test_is_mp4_signature(self, input_bytes, expected):
+        if isinstance(input_bytes, str):
+            with open(f"tests/files/{input_bytes}", "rb") as input_file:
+                input_bytes = input_file.read()
         assert is_mp4_signature(input_bytes) == expected
 
     @pytest.mark.parametrize(
         "input_bytes,expected",
         [
-            (body_webm, True),
+            ("foo.webm", True),
             (b"\x00\x00\x00", False),
             (b"\x1aF\xdf\xa3", False),
             (b"\x1aE\xdf\xa3B\x82", False),
@@ -66,6 +60,9 @@ class TestUtils:
         ],
     )
     def test_is_webm_signature(self, input_bytes, expected):
+        if isinstance(input_bytes, str):
+            with open(f"tests/files/{input_bytes}", "rb") as input_file:
+                input_bytes = input_file.read()
         assert is_webm_signature(input_bytes) == expected
 
     def test_parse_vint_number_size(self):
@@ -75,31 +72,37 @@ class TestUtils:
     @pytest.mark.parametrize(
         "framesize,input_bytes,expected",
         [
-            (417, body_nonid3, True),
+            (417, "NonID3.mp3", True),
             (417, b"\x00\x00\x00", False),
             (417, b"\xff\xfb\x90d\x00", False),
-            (10, body_nonid3[:50], False),
+            (10, "NonID3.mp3", False),
         ],
     )
     @mock.patch("xtractmime._utils.mp3_framesize")
     def test_is_mp3_non_ID3_signature(self, mock_framesize, framesize, input_bytes, expected):
+        if isinstance(input_bytes, str):
+            with open(f"tests/files/{input_bytes}", "rb") as input_file:
+                input_bytes = input_file.read()
         mock_framesize.return_value = framesize
         assert is_mp3_non_ID3_signature(input_bytes) == expected
 
     @pytest.mark.parametrize(
-        "input_bytes,input_size,index,expected",
+        "input_bytes,index,expected",
         [
-            (body_nonid3, len(body_nonid3), 0, True),
-            (b"\x00\x00\x00", 3, 0, False),
-            (b"\x00\x00\x00\x00", 4, 0, False),
-            (b"\xff\xe0\x00\x00", 4, 0, False),
-            (b"\xff\xe7\xf0\x00", 4, 0, False),
-            (b"\xff\xe7\x0c\x00", 4, 0, False),
-            (b"\xff\xe7\x00\x00", 4, 0, False),
+            ("NonID3.mp3", 0, True),
+            (b"\x00\x00\x00", 0, False),
+            (b"\x00\x00\x00\x00", 0, False),
+            (b"\xff\xe0\x00\x00", 0, False),
+            (b"\xff\xe7\xf0\x00", 0, False),
+            (b"\xff\xe7\x0c\x00", 0, False),
+            (b"\xff\xe7\x00\x00", 0, False),
         ],
     )
-    def test_match_mp3_header(self, input_bytes, input_size, index, expected):
-        assert match_mp3_header(input_bytes, input_size, index) == expected
+    def test_match_mp3_header(self, input_bytes, index, expected):
+        if isinstance(input_bytes, str):
+            with open(f"tests/files/{input_bytes}", "rb") as input_file:
+                input_bytes = input_file.read()
+        assert match_mp3_header(input_bytes, len(input_bytes), index) == expected
 
     @pytest.mark.parametrize(
         "input_bytes,expected",
@@ -119,14 +122,17 @@ class TestUtils:
     @pytest.mark.parametrize(
         "input_bytes,expected",
         [
-            (body_mp3, "audio/mpeg"),
-            (body_mp4, "video/mp4"),
-            (body_webm, "video/webm"),
-            (body_nonid3, "audio/mpeg"),
+            ("foo.mp3", "audio/mpeg"),
+            ("foo.mp4", "video/mp4"),
+            ("foo.webm", "video/webm"),
+            ("NonID3.mp3", "audio/mpeg"),
             (b"\x00\x00\x00\x00", None),
         ],
     )
     def test_audio_video(self, input_bytes, expected):
+        if isinstance(input_bytes, str):
+            with open(f"tests/files/{input_bytes}", "rb") as input_file:
+                input_bytes = input_file.read()
         assert is_audio_video(input_bytes) == expected
 
     def test_image(self):

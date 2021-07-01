@@ -10,7 +10,7 @@ from xtractmime._patterns import (
 )
 
 SAMPLE_RATES = (44100, 48000, 32000)
-MP25_RATES = [
+MP25_RATES = (
     0,
     8000,
     16000,
@@ -26,8 +26,8 @@ MP25_RATES = [
     128000,
     144000,
     160000,
-]
-MP3_RATES = [
+)
+MP3_RATES = (
     0,
     32000,
     40000,
@@ -43,7 +43,7 @@ MP3_RATES = [
     224000,
     256000,
     320000,
-]
+)
 
 
 def is_mp4_signature(input_bytes: bytes) -> bool:
@@ -75,10 +75,9 @@ def parse_vint_number_size(input_bytes: memoryview) -> int:
     """Returns an integer value by which the index in the current input bytes of a
     WebM file should be incremented
 
-    Based on https://mimesniff.spec.whatwg.org/commit-snapshots/
-    609a3a3c935fbb805b46cf3d90768d695a1dcff2/#signature-for-webm, This implementation
-    doesn't compute the value for "parsed number" as there is no specific use of it
-    in implementing the function "is_webm_signature()"."""
+    Based on https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#signature-for-webm,  # noqa: E501
+    This implementation doesn't compute the value for "parsed number" as there is
+    no specific use of it in implementing the function "is_webm_signature()"."""
     input_size = len(input_bytes)
     mask = 128
     max_vint_size = 8
@@ -94,12 +93,12 @@ def parse_vint_number_size(input_bytes: memoryview) -> int:
 def is_webm_signature(input_bytes: bytes) -> bool:
     """Returns True if the input bytes belong to a WebM file, or False otherwise.
 
-    Based on https://mimesniff.spec.whatwg.org/commit-snapshots/
-    609a3a3c935fbb805b46cf3d90768d695a1dcff2/#signature-for-webm, This implementation
-    has been slightly changed according to the https://github.com/whatwg/mimesniff/
-    issues/93 which suggests that index can never be more than 38, and input_size can
-    be as much as 1445 according to the standards which means that "less than" mentioned
-    on line 6.1.5 should actually read "greater than or equal to"."""
+    Based on https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#signature-for-webm,  # noqa: E501
+    This implementation has been slightly changed according to the
+    https://github.com/whatwg/mimesniff/issues/93 which suggests that index can
+    never be more than 38, and input_size can be as much as 1445 according to the
+    standards which means that "less than" mentioned on line 6.1.5 should actually
+    read "greater than or equal to"."""
     input_size = len(input_bytes)
     if input_size < 4:
         return False
@@ -202,8 +201,7 @@ def is_mp3_non_ID3_signature(input_bytes: bytes) -> bool:
     metadata, or False otherwise.
 
     This implementation does not match with standards due to various
-    problems with the algorithm according to
-    https://github.com/whatwg/mimesniff/issues/70.
+    problems with the algorithm according to https://github.com/whatwg/mimesniff/issues/70.
 
     The current implementation follows
     https://dxr.mozilla.org/mozilla-central/source/toolkit/components/mediasniffer/mp3sniff.c
