@@ -158,6 +158,9 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: Optional[Tuple[byte
 
                     index += 1
 
+            if loop_break:
+                break
+
             if input_bytes[index:index+3] == b"rss":
                 return b"application/rss+xml"
 
