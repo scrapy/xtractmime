@@ -109,6 +109,7 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: Optional[Tuple[byte
             index += 1
     
         while True:
+            loop_break = False
             if not input_bytes[index:index+1]:
                 return supplied_type
 
@@ -120,9 +121,13 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: Optional[Tuple[byte
 
                     if input_bytes[index:index+3] == b"-->":
                         index += 3
-                        return supplied_type
+                        loop_break = True
+                        break
 
                     index += 1
+
+            if loop_break:
+                break
 
             if input_bytes[index:index+1] == b"!":
                 index += 1
@@ -132,12 +137,66 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: Optional[Tuple[byte
 
                     if input_bytes[index:index+3] == b">":
                         index += 1
-                        return supplied_type
+                        loop_break = True
+                        break
+
                     index += 1
 
-        # Completed Till Section 7.3 5.2.3.3
+            if loop_break:
+                break
 
-    return ""
+            if input_bytes[index:index+1] == b"?":
+                index += 1
+                while True:
+                    if not input_bytes[index:index+1]:
+                        return supplied_type
+
+                    if input_bytes[index:index+2] == "?>":
+                        index += 2
+                        loop_break = True
+                        break
+
+                    index += 1
+
+            if input_bytes[index:index+3] == b"rss":
+                return b"application/rss+xml"
+
+            if input_bytes[index:index+4] == b"feed":
+                return b"application/atom+xml"
+
+            if input_bytes[index:index+7] == b"rdf:RDF":
+                index += 7
+                while True:
+                    if not input_bytes[index:index+1]:
+                        return supplied_type
+
+                    if input_bytes[index:index+24] == b"http://purl.org/rss/1.0/":
+                        index += 24
+                        while True:
+                            if not input_bytes[index:index+1]:
+                                return supplied_type
+
+                            if input_bytes[index:index+43] == b"http://www.w3.org/1999/02/22-rdf-syntax-ns#":
+                                return b"application/rss+xml"
+
+                            index += 1
+
+                    if input_bytes[index:index+43] == b"http://www.w3.org/1999/02/22-rdf-syntax-ns#":
+                        index += 43
+                        while True:
+                            if not input_bytes[index:index+1]:
+                                return supplied_type
+
+                            if input_bytes[index:index+24] == b"http://purl.org/rss/1.0/":
+                                return b"application/rss+xml"
+
+                            index += 1
+
+                    index += 1
+
+            return supplied_type
+
+    return supplied_type
 
 
 def extract_mime(
@@ -166,7 +225,7 @@ def extract_mime(
     if supplied_type.endswith("+xml") or supplied_type in {"text/xml", "application/xml"}:
         return supplied_type
 
-    if supplied_type.startswith("text/html"):
+    if supplied_type == "text/html":
         return _sniff_mislabled_feed(resource_header)
 
     if supplied_type.startswith("image/"):
@@ -175,7 +234,7 @@ def extract_mime(
             return matched_type
 
     video_types = ("audio/","video/")
-    if supplied_type.startswith(video_types) or supplied_type.startswith("application/ogg"):
+    if supplied_type.startswith(video_types) or supplied_type == "application/ogg":
         matched_type = get_audio_video_mime(resource_header)
         if matched_type in supported_types:
             return matched_type
