@@ -3,10 +3,12 @@ import pytest
 from unittest import mock
 
 from xtractmime._utils import (
-    is_archive,
-    is_audio_video,
-    is_font,
-    is_image,
+    get_archive_mime,
+    get_audio_video_mime,
+    get_extra_mime,
+    get_font_mime,
+    get_image_mime,
+    get_text_mime,
     is_mp3_non_ID3_signature,
     is_mp4_signature,
     is_webm_signature,
@@ -133,16 +135,16 @@ class TestUtils:
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
-        assert is_audio_video(input_bytes) == expected
+        assert get_audio_video_mime(input_bytes) == expected
 
     def test_image(self):
-        assert is_image(self.body_gif) == "image/gif"
-        assert is_image(b"\x00\x00\x00\x00") is None
+        assert get_image_mime(self.body_gif) == "image/gif"
+        assert get_image_mime(b"\x00\x00\x00\x00") is None
 
     def test_font(self):
-        assert is_font(self.body_ttf) == "font/ttf"
-        assert is_font(b"\x00\x00\x00\x00") is None
+        assert get_font_mime(self.body_ttf) == "font/ttf"
+        assert get_font_mime(b"\x00\x00\x00\x00") is None
 
     def test_archive(self):
-        assert is_archive(self.body_zip) == "application/zip"
-        assert is_archive(b"\x00\x00\x00\x00") is None
+        assert get_archive_mime(self.body_zip) == "application/zip"
+        assert get_archive_mime(b"\x00\x00\x00\x00") is None

@@ -1,10 +1,13 @@
 __version__ = "0.0.0"
 from typing import Optional, Set, Tuple
 from xtractmime._utils import (
-    is_archive,
-    is_audio_video,
-    is_font,
-    is_image,
+    contains_binary,
+    get_archive_mime,
+    get_audio_video_mime,
+    get_extra_mime,
+    get_font_mime,
+    get_image_mime,
+    get_text_mime,
 )
 
 _APACHE_TYPES = [
@@ -14,6 +17,7 @@ _APACHE_TYPES = [
     b"text/plain; charset=UTF-8",
 ]
 WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
+
 
 
 def _is_match_mime_pattern(
@@ -45,19 +49,95 @@ def _is_match_mime_pattern(
     return True
 
 
-def _find_unknown_mimetype(input_bytes: bytes, sniff_scriptable: bool):
-    # TODO
-    pass
+def _find_unknown_mimetype(input_bytes: bytes, sniff_scriptable: bool, extra_types: Optional[Tuple[Tuple[bytes, bytes, Set[bytes], str], ...]]) -> str:
+    if sniff_scriptable:
+        return get_text_mime(input_bytes)
+
+    matched_type = get_extra_mime(input_bytes, extra_types=extra_types)
+    if matched_type:
+        return matched_type
+
+    matched_type = get_image_mime(input_bytes)
+    if matched_type:
+        return matched_type
+
+    matched_type = get_audio_video_mime(input_bytes)
+    if matched_type:
+        return matched_type
+
+    matched_type = get_archive_mime(input_bytes)
+    if matched_type:
+        return matched_type
+
+    if not contains_binary(input_bytes):
+        return "text/plain"
+    
+    return "application/octet-stream"
 
 
-def _sniff_mislabled_binary(input_bytes: bytes):
-    # TODO
-    pass
+def _sniff_mislabled_binary(input_bytes: bytes) -> str:
+    input_size = len(input_bytes)
+    
+    if input_size >= 2 and input_bytes.startswith((b"\xfe\xff",b"\xff\xfe",b"\xef\xbb\xbf")):
+        return "text/plain"
+    
+    if not contains_binary(input_bytes):
+        return "text/plain"
+    
+    return "application/octet-stream"
 
 
-def _compare_feed_html(input_bytes: bytes):
-    # TODO
-    pass
+def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: Optional[Tuple[bytes]]) -> str:
+    input_size = len(input_bytes)
+    index = 0
+
+    if input_bytes[:3] == b"\xef\xbb\xbf":
+        index += 3
+
+    while index < input_size:
+        while True:
+            if not input_bytes[index:index+1]:
+                return supplied_type
+
+            if input_bytes[index:index+1] == b"<":
+                index += 1
+                break
+
+            if input_bytes[index:index+1] not in WHITESPACE_BYTES:
+                return supplied_type
+
+            index += 1
+    
+        while True:
+            if not input_bytes[index:index+1]:
+                return supplied_type
+
+            if input_bytes[index:index+3] == b"!--":
+                index += 3
+                while True:
+                    if not input_bytes[index:index+1]:
+                        return supplied_type
+
+                    if input_bytes[index:index+3] == b"-->":
+                        index += 3
+                        return supplied_type
+
+                    index += 1
+
+            if input_bytes[index:index+1] == b"!":
+                index += 1
+                while True:
+                    if not input_bytes[index:index+1]:
+                        return supplied_type
+
+                    if input_bytes[index:index+3] == b">":
+                        index += 1
+                        return supplied_type
+                    index += 1
+
+        # Completed Till Section 7.3 5.2.3.3
+
+    return ""
 
 
 def extract_mime(
@@ -67,35 +147,37 @@ def extract_mime(
     http_origin: bool = True,
     no_sniff: bool = False,
     extra_types: Optional[Tuple[Tuple[bytes, bytes, Set[bytes], str], ...]] = None,
+    supported_types: Set[str] = None,
 ) -> str:
     extra_types = extra_types or tuple()
     supplied_type = content_types[-1] if content_types else None
     check_for_apache = http_origin and supplied_type in _APACHE_TYPES
-    resource_header = memoryview(body) if len(body) < 1445 else memoryview(body)[:1445]
+    resource_header = memoryview(body)[:1445]
 
     if supplied_type in (None, "unknown/unknown", "application/unknown", "*/*"):
-        _find_unknown_mimetype(body, not no_sniff)
+        _find_unknown_mimetype(resource_header, not no_sniff, extra_types)
 
     if no_sniff:
         return supplied_type
 
     if check_for_apache:
-        return _sniff_mislabled_binary(body)
+        return _sniff_mislabled_binary(resource_header)
 
-    if supplied_type[-4:] is "+xml" or supplied_type in ("text/xml", "application/xml"):
+    if supplied_type.endswith("+xml") or supplied_type in {"text/xml", "application/xml"}:
         return supplied_type
 
-    if supplied_type is "text/html":
-        return _compare_feed_html(body)
+    if supplied_type.startswith("text/html"):
+        return _sniff_mislabled_feed(resource_header)
 
-    matched_type = is_image(resource_header)
+    if supplied_type.startswith("image/"):
+        matched_type = get_image_mime(resource_header)
+        if matched_type in supported_types:
+            return matched_type
 
-    if matched_type:
-        return matched_type
-
-    matched_type = is_audio_video(resource_header)
-
-    if matched_type:
-        return matched_type
+    video_types = ("audio/","video/")
+    if supplied_type.startswith(video_types) or supplied_type.startswith("application/ogg"):
+        matched_type = get_audio_video_mime(resource_header)
+        if matched_type in supported_types:
+            return matched_type
 
     return supplied_type

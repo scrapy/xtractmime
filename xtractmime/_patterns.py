@@ -1,3 +1,37 @@
+from xtractmime import WHITESPACE_BYTES
+
+#: Section 3
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#terminology  # noqa: E501
+BINARY_BYTES = (
+    b"\x00",
+    b"\x01",
+    b"\x02",
+    b"\x03",
+    b"\x04",
+    b"\x05",
+    b"\x06",
+    b"\x07",
+    b"\x08",
+    b"\x0b",
+    b"\x0e",
+    b"\x0f",
+    b"\x10",
+    b"\x11",
+    b"\x12",
+    b"\x13",
+    b"\x14",
+    b"\x15",
+    b"\x16",
+    b"\x17",
+    b"\x18",
+    b"\x19",
+    b"\x1a",
+    b"\x1c",
+    b"\x1d",
+    b"\x1e",
+    b"\x1f",
+)
+
 #: Section 6.1, step 1
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-image-type-pattern  # noqa: E501
 IMAGE_PATTERNS = (
@@ -75,6 +109,44 @@ ARCHIVE_PATTERNS = (
 
 #: Section 7.1, step 1
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
-TEXT_PATTERNS = (
-
+TEXT_PATTERNS_1 = tuple(
+    (prefix + suffix, mask, WHITESPACE_BYTES, "text/html")
+    for prefix, mask, in (
+        (b"<!DOCTYPE HTML", b'\xff\xff\xdf\xdf\xdf\xdf\xdf\xdf\xdf\xff\xdf\xdf\xdf\xdf\xff'),
+        (b'<HTML', b'\xff\xdf\xdf\xdf\xdf\xff'),
+        (b'<HEAD', b'\xff\xdf\xdf\xdf\xdf\xff'),
+        (b'<SCRIPT', b'\xff\xdf\xdf\xdf\xdf\xdf\xdf\xff'),
+        (b'<IFRAME', b'\xff\xdf\xdf\xdf\xdf\xdf\xdf\xff'),
+        (b'<H1', b'\xff\xdf\xff\xff'),
+        (b'<DIV', b'\xff\xdf\xdf\xdf\xff'),
+        (b'<FONT', b'\xff\xdf\xdf\xdf\xdf\xff'),
+        (b'<TABLE', b'\xff\xdf\xdf\xdf\xdf\xdf\xff'),
+        (b'<A', b'\xff\xdf\xff'),
+        (b'<STYLE', b'\xff\xdf\xdf\xdf\xdf\xdf\xff'),
+        (b'<TITLE', b'\xff\xdf\xdf\xdf\xdf\xdf\xff'),
+        (b'<B', b'\xff\xdf\xff'),
+        (b'<BODY', b'\xff\xdf\xdf\xdf\xdf\xff'),
+        (b'<BR', b'\xff\xdf\xdf\xff'),
+        (b'<P', b'\xff\xdf\xff'),
+        (b'<!--', b'\xff\xff\xff\xff\xff')
     )
+    for suffix in (b"\x20", b"\x3E")
+)
+TEXT_PATTERNS_2 = (
+    (b'<?xml', b'\xff\xff\xff\xff\xff', WHITESPACE_BYTES, "text/xml"),
+    (b'%PDF-', b'\xff\xff\xff\xff\xff', None, "application/pdf")
+    )
+
+#: Section 7.1, step 2
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
+EXTRA_PATTERNS = (
+    (
+        b"%!PS-Adobe-",
+        b"\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff",
+        None,
+        "application/postscript",
+    ),
+    (b"\xfe\xff\x00\x00", b"\xff\xff\x00\x00", None, "text/plain"),
+    (b"\xff\xfe\x00\x00", b"\xff\xff\x00\x00", None, "text/plain"),
+    (b"\xef\xbb\xbf\x00", b"\xff\xff\xff\x00", None, "text/plain"),
+)

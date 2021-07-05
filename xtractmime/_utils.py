@@ -1,12 +1,16 @@
 from struct import unpack
-from typing import Tuple, Union
+from typing import Optional, Set, Tuple, Union
 
 from xtractmime import _is_match_mime_pattern
 from xtractmime._patterns import (
     ARCHIVE_PATTERNS,
     AUDIO_VIDEO_PATTERNS,
+    BINARY_BYTES,
+    EXTRA_PATTERNS,
     FONT_PATTERNS,
     IMAGE_PATTERNS,
+    TEXT_PATTERNS_1,
+    TEXT_PATTERNS_2,
 )
 
 SAMPLE_RATES = (44100, 48000, 32000)
@@ -228,7 +232,7 @@ def is_mp3_non_ID3_signature(input_bytes: bytes) -> bool:
         return False
 
 
-def is_image(input_bytes: bytes) -> Union[str, None]:
+def get_image_mime(input_bytes: bytes) -> Union[str, None]:
     for pattern in IMAGE_PATTERNS:
         if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
@@ -236,7 +240,7 @@ def is_image(input_bytes: bytes) -> Union[str, None]:
     return None
 
 
-def is_audio_video(input_bytes: bytes) -> Union[str, None]:
+def get_audio_video_mime(input_bytes: bytes) -> Union[str, None]:
     for pattern in AUDIO_VIDEO_PATTERNS:
         if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
@@ -253,7 +257,7 @@ def is_audio_video(input_bytes: bytes) -> Union[str, None]:
     return None
 
 
-def is_font(input_bytes: bytes) -> Union[str, None]:
+def get_font_mime(input_bytes: bytes) -> Union[str, None]:
     for pattern in FONT_PATTERNS:
         if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
@@ -261,9 +265,41 @@ def is_font(input_bytes: bytes) -> Union[str, None]:
     return None
 
 
-def is_archive(input_bytes: bytes) -> Union[str, None]:
+def get_archive_mime(input_bytes: bytes) -> Union[str, None]:
     for pattern in ARCHIVE_PATTERNS:
         if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     return None
+
+
+def get_text_mime(input_bytes: bytes) -> Union[str, None]:
+    for pattern in TEXT_PATTERNS_1:
+        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+            return pattern[3]
+
+    for pattern in TEXT_PATTERNS_2:
+        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+            return pattern[3]
+
+    return None
+
+def get_extra_mime(input_bytes: bytes, extra_types: Optional[Tuple[Tuple[bytes, bytes, Set[bytes], str], ...]]) -> Union[str, None]:
+    for pattern in EXTRA_PATTERNS:
+        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+            return pattern[3]
+
+    if extra_types:
+        for pattern in extra_types:
+            if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+                return pattern[3]
+
+    return None
+
+
+def contains_binary(input_bytes: bytes) -> bool:
+    for i in input_bytes:
+        if i in BINARY_BYTES:
+            return True
+
+    return False
