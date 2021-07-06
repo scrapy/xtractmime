@@ -64,7 +64,7 @@ def is_mp4_signature(input_bytes: bytes) -> bool:
 
     bytes_read = 16
     while bytes_read < box_size:
-        if input_bytes[bytes_read : bytes_read + 3] == b"mp4":
+        if input_bytes[bytes_read : bytes_read + 3] == b"mp4":  # noqa: E203
             return True
         bytes_read += 4
 
@@ -72,12 +72,13 @@ def is_mp4_signature(input_bytes: bytes) -> bool:
 
 
 def parse_vint_number_size(input_bytes: memoryview) -> int:
-    """Returns an integer value by which the index in the current input bytes of a
+    """Return an integer value by which the index in the current input bytes of a
     WebM file should be incremented
 
     Based on https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#signature-for-webm,  # noqa: E501
     This implementation doesn't compute the value for "parsed number" as there is
-    no specific use of it in implementing the function "is_webm_signature()"."""
+    no specific use of it in implementing the function "is_webm_signature()".
+    """
     input_size = len(input_bytes)
     mask = 128
     max_vint_size = 8
@@ -91,14 +92,15 @@ def parse_vint_number_size(input_bytes: memoryview) -> int:
 
 
 def is_webm_signature(input_bytes: bytes) -> bool:
-    """Returns True if the input bytes belong to a WebM file, or False otherwise.
+    """Return True if the input bytes belong to a WebM file, or False otherwise.
 
     Based on https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#signature-for-webm,  # noqa: E501
     This implementation has been slightly changed according to the
     https://github.com/whatwg/mimesniff/issues/93 which suggests that index can
     never be more than 38, and input_size can be as much as 1445 according to the
     standards which means that "less than" mentioned on line 6.1.5 should actually
-    read "greater than or equal to"."""
+    read "greater than or equal to".
+    """
     input_size = len(input_bytes)
     if input_size < 4:
         return False
@@ -110,7 +112,7 @@ def is_webm_signature(input_bytes: bytes) -> bool:
 
     limit = min(input_size, 38)
     while index < limit:
-        if input_bytes[index : index + 2] == b"B\x82":
+        if input_bytes[index : index + 2] == b"B\x82":  # noqa: E203
             index += 2
 
             if index >= input_size:
@@ -122,7 +124,7 @@ def is_webm_signature(input_bytes: bytes) -> bool:
             if index >= input_size - 4:
                 break
 
-            if input_bytes[index : index + 4] == b"webm":
+            if input_bytes[index : index + 4] == b"webm":  # noqa: E203
                 return True
         index += 1
 
@@ -134,7 +136,7 @@ def match_mp3_header(input_bytes: bytes, input_size: int, index: int) -> bool:
         return False
 
     if (
-        input_bytes[index : index + 1] != b"\xff"
+        input_bytes[index : index + 1] != b"\xff"  # noqa: E203
         or bytes([input_bytes[index + 1] & 224]) != b"\xe0"
     ):
         return False
@@ -197,7 +199,7 @@ def mp3_framesize(version, bit_rate, freq, pad) -> int:
 
 
 def is_mp3_non_ID3_signature(input_bytes: bytes) -> bool:
-    """Returns True if the input bytes belong to an MP3 file without ID3
+    """Return True if the input bytes belong to an MP3 file without ID3
     metadata, or False otherwise.
 
     This implementation does not match with standards due to various
@@ -206,7 +208,8 @@ def is_mp3_non_ID3_signature(input_bytes: bytes) -> bool:
     The current implementation follows
     https://dxr.mozilla.org/mozilla-central/source/toolkit/components/mediasniffer/mp3sniff.c
     as the algorithm for MP3 without ID3 sniffing mentioned in standards is originally
-    based on mp3sniff.c."""
+    based on mp3sniff.c.
+    """
     input_size = len(input_bytes)
     index = 0
 
