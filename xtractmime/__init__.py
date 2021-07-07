@@ -48,7 +48,7 @@ def extract_mime(
     content_types: Optional[Tuple[Union[bytes, str]]] = None,
     http_origin: bool = True,
     no_sniff: bool = False,
-    extra_types: Optional[Tuple[Tuple[bytes, bytes, Set[bytes], str], ...]] = None,
-) -> str:
+    extra_types: Optional[Tuple[Tuple[bytes, bytes, Set[bytes], Union[bytes, str]], ...]] = None,
+) -> bytes:
 
-    return "mimetype"
+    return b"mimetype"

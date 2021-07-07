@@ -122,10 +122,10 @@ class TestUtils:
     @pytest.mark.parametrize(
         "input_bytes,expected",
         [
-            ("foo.mp3", "audio/mpeg"),
-            ("foo.mp4", "video/mp4"),
-            ("foo.webm", "video/webm"),
-            ("NonID3.mp3", "audio/mpeg"),
+            ("foo.mp3", b"audio/mpeg"),
+            ("foo.mp4", b"video/mp4"),
+            ("foo.webm", b"video/webm"),
+            ("NonID3.mp3", b"audio/mpeg"),
             (b"\x00\x00\x00\x00", None),
         ],
     )
@@ -136,13 +136,13 @@ class TestUtils:
         assert is_audio_video(input_bytes) == expected
 
     def test_image(self):
-        assert is_image(self.body_gif) == "image/gif"
+        assert is_image(self.body_gif) == b"image/gif"
         assert is_image(b"\x00\x00\x00\x00") is None
 
     def test_font(self):
-        assert is_font(self.body_ttf) == "font/ttf"
+        assert is_font(self.body_ttf) == b"font/ttf"
         assert is_font(b"\x00\x00\x00\x00") is None
 
     def test_archive(self):
-        assert is_archive(self.body_zip) == "application/zip"
+        assert is_archive(self.body_zip) == b"application/zip"
         assert is_archive(b"\x00\x00\x00\x00") is None

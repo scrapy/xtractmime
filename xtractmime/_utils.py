@@ -1,5 +1,5 @@
 from struct import unpack
-from typing import Tuple, Union
+from typing import Optional, Tuple
 
 from xtractmime import _is_match_mime_pattern
 from xtractmime._patterns import (
@@ -231,7 +231,7 @@ def is_mp3_non_ID3_signature(input_bytes: bytes) -> bool:
         return False
 
 
-def is_image(input_bytes: bytes) -> Union[str, None]:
+def is_image(input_bytes: bytes) -> Optional[bytes]:
     for pattern in IMAGE_PATTERNS:
         if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
@@ -239,24 +239,24 @@ def is_image(input_bytes: bytes) -> Union[str, None]:
     return None
 
 
-def is_audio_video(input_bytes: bytes) -> Union[str, None]:
+def is_audio_video(input_bytes: bytes) -> Optional[bytes]:
     for pattern in AUDIO_VIDEO_PATTERNS:
         if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     if is_mp4_signature(input_bytes):
-        return "video/mp4"
+        return b"video/mp4"
 
     if is_webm_signature(input_bytes):
-        return "video/webm"
+        return b"video/webm"
 
     if is_mp3_non_ID3_signature(input_bytes):
-        return "audio/mpeg"
+        return b"audio/mpeg"
 
     return None
 
 
-def is_font(input_bytes: bytes) -> Union[str, None]:
+def is_font(input_bytes: bytes) -> Optional[bytes]:
     for pattern in FONT_PATTERNS:
         if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
@@ -264,7 +264,7 @@ def is_font(input_bytes: bytes) -> Union[str, None]:
     return None
 
 
-def is_archive(input_bytes: bytes) -> Union[str, None]:
+def is_archive(input_bytes: bytes) -> Optional[bytes]:
     for pattern in ARCHIVE_PATTERNS:
         if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
