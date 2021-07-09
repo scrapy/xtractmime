@@ -1,7 +1,6 @@
 from struct import unpack
 from typing import Optional, Set, Tuple, Union
 
-from xtractmime import _is_match_mime_pattern
 from xtractmime._patterns import (
     ARCHIVE_PATTERNS,
     AUDIO_VIDEO_PATTERNS,
@@ -50,6 +49,38 @@ MP3_RATES = (
 )
 
 
+def is_match_mime_pattern(
+    input_bytes: bytes, byte_pattern: bytes, pattern_mask: bytes, lstrip: Set[bytes] = None
+) -> bool:
+    input_size = len(input_bytes)
+    pattern_size = len(byte_pattern)
+    mask_size = len(pattern_mask)
+
+    if pattern_size != mask_size:
+        raise ValueError("pattern's length should match mask's length")
+
+    if input_size < pattern_size:
+        return False
+
+    input_index, pattern_index = 0, 0
+
+    if lstrip:
+        while (
+            input_index < input_size
+            and input_bytes[input_index : input_index + 1] in lstrip  # noqa: E203
+        ):
+            input_index += 1
+
+    while pattern_index < pattern_size:
+        masked_byte = bytes([input_bytes[input_index] & pattern_mask[pattern_index]])
+        if masked_byte != byte_pattern[pattern_index : pattern_index + 1]:  # noqa: E203
+            return False
+        input_index += 1
+        pattern_index += 1
+
+    return True
+
+
 def is_mp4_signature(input_bytes: bytes) -> bool:
     input_size = len(input_bytes)
     if input_size < 12:
@@ -68,7 +99,7 @@ def is_mp4_signature(input_bytes: bytes) -> bool:
 
     bytes_read = 16
     while bytes_read < box_size:
-        if input_bytes[bytes_read : bytes_read + 3] == b"mp4":
+        if input_bytes[bytes_read : bytes_read + 3] == b"mp4":  # noqa: E203
             return True
         bytes_read += 4
 
@@ -76,12 +107,13 @@ def is_mp4_signature(input_bytes: bytes) -> bool:
 
 
 def parse_vint_number_size(input_bytes: memoryview) -> int:
-    """Returns an integer value by which the index in the current input bytes of a
+    """Return an integer value by which the index in the current input bytes of a
     WebM file should be incremented
 
     Based on https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#signature-for-webm,  # noqa: E501
     This implementation doesn't compute the value for "parsed number" as there is
-    no specific use of it in implementing the function "is_webm_signature()"."""
+    no specific use of it in implementing the function "is_webm_signature()".
+    """
     input_size = len(input_bytes)
     mask = 128
     max_vint_size = 8
@@ -95,14 +127,15 @@ def parse_vint_number_size(input_bytes: memoryview) -> int:
 
 
 def is_webm_signature(input_bytes: bytes) -> bool:
-    """Returns True if the input bytes belong to a WebM file, or False otherwise.
+    """Return True if the input bytes belong to a WebM file, or False otherwise.
 
     Based on https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#signature-for-webm,  # noqa: E501
     This implementation has been slightly changed according to the
     https://github.com/whatwg/mimesniff/issues/93 which suggests that index can
     never be more than 38, and input_size can be as much as 1445 according to the
     standards which means that "less than" mentioned on line 6.1.5 should actually
-    read "greater than or equal to"."""
+    read "greater than or equal to".
+    """
     input_size = len(input_bytes)
     if input_size < 4:
         return False
@@ -114,7 +147,7 @@ def is_webm_signature(input_bytes: bytes) -> bool:
 
     limit = min(input_size, 38)
     while index < limit:
-        if input_bytes[index : index + 2] == b"B\x82":
+        if input_bytes[index : index + 2] == b"B\x82":  # noqa: E203
             index += 2
 
             if index >= input_size:
@@ -126,7 +159,7 @@ def is_webm_signature(input_bytes: bytes) -> bool:
             if index >= input_size - 4:
                 break
 
-            if input_bytes[index : index + 4] == b"webm":
+            if input_bytes[index : index + 4] == b"webm":  # noqa: E203
                 return True
         index += 1
 
@@ -138,7 +171,7 @@ def match_mp3_header(input_bytes: bytes, input_size: int, index: int) -> bool:
         return False
 
     if (
-        input_bytes[index : index + 1] != b"\xff"
+        input_bytes[index : index + 1] != b"\xff"  # noqa: E203
         or bytes([input_bytes[index + 1] & 224]) != b"\xe0"
     ):
         return False
@@ -201,7 +234,7 @@ def mp3_framesize(version, bit_rate, freq, pad) -> int:
 
 
 def is_mp3_non_ID3_signature(input_bytes: bytes) -> bool:
-    """Returns True if the input bytes belong to an MP3 file without ID3
+    """Return True if the input bytes belong to an MP3 file without ID3
     metadata, or False otherwise.
 
     This implementation does not match with standards due to various
@@ -210,7 +243,8 @@ def is_mp3_non_ID3_signature(input_bytes: bytes) -> bool:
     The current implementation follows
     https://dxr.mozilla.org/mozilla-central/source/toolkit/components/mediasniffer/mp3sniff.c
     as the algorithm for MP3 without ID3 sniffing mentioned in standards is originally
-    based on mp3sniff.c."""
+    based on mp3sniff.c.
+    """
     input_size = len(input_bytes)
     index = 0
 
@@ -232,66 +266,66 @@ def is_mp3_non_ID3_signature(input_bytes: bytes) -> bool:
         return False
 
 
-def get_image_mime(input_bytes: bytes) -> Union[str, None]:
+def get_image_mime(input_bytes: bytes) -> Optional[bytes]:
     for pattern in IMAGE_PATTERNS:
-        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     return None
 
 
-def get_audio_video_mime(input_bytes: bytes) -> Union[str, None]:
+def get_audio_video_mime(input_bytes: bytes) -> Optional[bytes]:
     for pattern in AUDIO_VIDEO_PATTERNS:
-        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     if is_mp4_signature(input_bytes):
-        return "video/mp4"
+        return b"video/mp4"
 
     if is_webm_signature(input_bytes):
-        return "video/webm"
+        return b"video/webm"
 
     if is_mp3_non_ID3_signature(input_bytes):
-        return "audio/mpeg"
+        return b"audio/mpeg"
 
     return None
 
 
-def get_font_mime(input_bytes: bytes) -> Union[str, None]:
+def get_font_mime(input_bytes: bytes) -> Optional[bytes]:
     for pattern in FONT_PATTERNS:
-        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     return None
 
 
-def get_archive_mime(input_bytes: bytes) -> Union[str, None]:
+def get_archive_mime(input_bytes: bytes) -> Optional[bytes]:
     for pattern in ARCHIVE_PATTERNS:
-        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     return None
 
 
-def get_text_mime(input_bytes: bytes) -> Union[str, None]:
+def get_text_mime(input_bytes: bytes) -> Optional[bytes]:
     for pattern in TEXT_PATTERNS_1:
-        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     for pattern in TEXT_PATTERNS_2:
-        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     return None
 
-def get_extra_mime(input_bytes: bytes, extra_types: Optional[Tuple[Tuple[bytes, bytes, Set[bytes], str], ...]]) -> Union[str, None]:
+def get_extra_mime(input_bytes: bytes, extra_types: Optional[Tuple[Tuple[bytes, bytes, Union[Set[bytes], None], bytes], ...]]) -> Optional[bytes]:
     for pattern in EXTRA_PATTERNS:
-        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     if extra_types:
         for pattern in extra_types:
-            if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+            if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
                 return pattern[3]
 
     return None
@@ -299,7 +333,7 @@ def get_extra_mime(input_bytes: bytes, extra_types: Optional[Tuple[Tuple[bytes, 
 
 def contains_binary(input_bytes: bytes) -> bool:
     for i in input_bytes:
-        if i in BINARY_BYTES:
+        if bytes([i]) in BINARY_BYTES:
             return True
 
     return False

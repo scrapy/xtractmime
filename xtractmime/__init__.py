@@ -1,5 +1,6 @@
 __version__ = "0.0.0"
-from typing import Optional, Set, Tuple
+from typing import Optional, Set, Tuple, Union
+from xtractmime._patterns import _APACHE_TYPES, WHITESPACE_BYTES
 from xtractmime._utils import (
     contains_binary,
     get_archive_mime,
@@ -10,46 +11,8 @@ from xtractmime._utils import (
     get_text_mime,
 )
 
-_APACHE_TYPES = [
-    b"text/plain",
-    b"text/plain; charset=ISO-8859-1",
-    b"text/plain; charset=iso-8859-1",
-    b"text/plain; charset=UTF-8",
-]
-WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
 
-
-
-def _is_match_mime_pattern(
-    input_bytes: bytes, byte_pattern: bytes, pattern_mask: bytes, lstrip: Set[bytes] = None
-) -> bool:
-    input_size = len(input_bytes)
-    pattern_size = len(byte_pattern)
-    mask_size = len(pattern_mask)
-
-    if pattern_size != mask_size:
-        raise ValueError("pattern's length should match mask's length")
-
-    if input_size < pattern_size:
-        return False
-
-    input_index, pattern_index = 0, 0
-
-    if lstrip:
-        while input_index < input_size and input_bytes[input_index : input_index + 1] in lstrip:
-            input_index += 1
-
-    while pattern_index < pattern_size:
-        masked_byte = bytes([input_bytes[input_index] & pattern_mask[pattern_index]])
-        if masked_byte != byte_pattern[pattern_index : pattern_index + 1]:
-            return False
-        input_index += 1
-        pattern_index += 1
-
-    return True
-
-
-def _find_unknown_mimetype(input_bytes: bytes, sniff_scriptable: bool, extra_types: Optional[Tuple[Tuple[bytes, bytes, Set[bytes], str], ...]]) -> str:
+def _find_unknown_mimetype(input_bytes: bytes, sniff_scriptable: bool, extra_types: Optional[Tuple[Tuple[bytes, bytes, Union[Set[bytes], None], bytes], ...]]) -> Optional[bytes]:
     if sniff_scriptable:
         return get_text_mime(input_bytes)
 
@@ -70,24 +33,24 @@ def _find_unknown_mimetype(input_bytes: bytes, sniff_scriptable: bool, extra_typ
         return matched_type
 
     if not contains_binary(input_bytes):
-        return "text/plain"
+        return b"text/plain"
     
-    return "application/octet-stream"
+    return b"application/octet-stream"
 
 
-def _sniff_mislabled_binary(input_bytes: bytes) -> str:
+def _sniff_mislabled_binary(input_bytes: bytes) -> Optional[bytes]:
     input_size = len(input_bytes)
     
     if input_size >= 2 and input_bytes.startswith((b"\xfe\xff",b"\xff\xfe",b"\xef\xbb\xbf")):
-        return "text/plain"
+        return b"text/plain"
     
     if not contains_binary(input_bytes):
-        return "text/plain"
+        return b"text/plain"
     
-    return "application/octet-stream"
+    return b"application/octet-stream"
 
 
-def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: Optional[Tuple[bytes]]) -> str:
+def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[bytes]:
     input_size = len(input_bytes)
     index = 0
 
@@ -205,18 +168,18 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: Optional[Tuple[byte
 def extract_mime(
     body: bytes,
     *,
-    content_types: Optional[Tuple[bytes]] = None,
+    content_types: Optional[Tuple[Union[bytes, str]]] = None,
     http_origin: bool = True,
     no_sniff: bool = False,
-    extra_types: Optional[Tuple[Tuple[bytes, bytes, Set[bytes], str], ...]] = None,
-    supported_types: Set[str] = None,
-) -> str:
+    extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]] = None,
+    supported_types: Set[bytes] = None,
+) -> Optional[bytes]:
     extra_types = extra_types or tuple()
-    supplied_type = content_types[-1] if content_types else None
+    supplied_type = content_types[-1] if content_types else b""
     check_for_apache = http_origin and supplied_type in _APACHE_TYPES
     resource_header = memoryview(body)[:1445]
 
-    if supplied_type in (None, "unknown/unknown", "application/unknown", "*/*"):
+    if supplied_type in (b"", b"unknown/unknown", b"application/unknown", b"*/*"):
         _find_unknown_mimetype(resource_header, not no_sniff, extra_types)
 
     if no_sniff:
@@ -225,21 +188,22 @@ def extract_mime(
     if check_for_apache:
         return _sniff_mislabled_binary(resource_header)
 
-    if supplied_type.endswith("+xml") or supplied_type in {"text/xml", "application/xml"}:
+    if supplied_type.endswith(b"+xml") or supplied_type in {b"text/xml", b"application/xml"}:
         return supplied_type
 
-    if supplied_type == "text/html":
-        return _sniff_mislabled_feed(resource_header)
+    if supplied_type == b"text/html":
+        return _sniff_mislabled_feed(resource_header, supplied_type)
 
-    if supplied_type.startswith("image/"):
-        matched_type = get_image_mime(resource_header)
-        if matched_type in supported_types:
-            return matched_type
+    if supported_types:
+        if supplied_type.startswith(b"image/"):
+            matched_type = get_image_mime(resource_header)
+            if matched_type in supported_types:
+                return matched_type
 
-    video_types = ("audio/","video/")
-    if supplied_type.startswith(video_types) or supplied_type == "application/ogg":
-        matched_type = get_audio_video_mime(resource_header)
-        if matched_type in supported_types:
-            return matched_type
+        video_types = (b"audio/",b"video/")
+        if supplied_type.startswith(video_types) or supplied_type == b"application/ogg":
+            matched_type = get_audio_video_mime(resource_header)
+            if matched_type in supported_types:
+                return matched_type
 
     return supplied_type
