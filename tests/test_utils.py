@@ -174,22 +174,28 @@ class TestUtils:
                 input_bytes = input_file.read()
         assert get_audio_video_mime(input_bytes) == expected
 
-    @pytest.mark.parametrize("input_bytes,expected",[
-        ("foo.html", b"text/html"),
-        ("foo.pdf", b"application/pdf"),
-        (b"\x00\x00\x00\x00", None),
-        ])
+    @pytest.mark.parametrize(
+        "input_bytes,expected",
+        [
+            ("foo.html", b"text/html"),
+            ("foo.pdf", b"application/pdf"),
+            (b"\x00\x00\x00\x00", None),
+        ],
+    )
     def test_text(self, input_bytes, expected):
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
         assert get_text_mime(input_bytes) == expected
 
-    @pytest.mark.parametrize("input_bytes,extra_types,expected",[
-        ("foo.ps", None, b"application/postscript"),
-        (b"test", ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),), b"text/test"),
-        (b"\x00\x00\x00\x00", None, None),
-        ])
+    @pytest.mark.parametrize(
+        "input_bytes,extra_types,expected",
+        [
+            ("foo.ps", None, b"application/postscript"),
+            (b"test", ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),), b"text/test"),
+            (b"\x00\x00\x00\x00", None, None),
+        ],
+    )
     def test_extra(self, input_bytes, extra_types, expected):
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:

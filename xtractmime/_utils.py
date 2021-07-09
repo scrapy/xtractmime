@@ -318,7 +318,11 @@ def get_text_mime(input_bytes: bytes) -> Optional[bytes]:
 
     return None
 
-def get_extra_mime(input_bytes: bytes, extra_types: Optional[Tuple[Tuple[bytes, bytes, Union[Set[bytes], None], bytes], ...]]) -> Optional[bytes]:
+
+def get_extra_mime(
+    input_bytes: bytes,
+    extra_types: Optional[Tuple[Tuple[bytes, bytes, Union[Set[bytes], None], bytes], ...]],
+) -> Optional[bytes]:
     for pattern in EXTRA_PATTERNS:
         if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]

@@ -118,30 +118,30 @@ ARCHIVE_PATTERNS = (
 TEXT_PATTERNS_1 = tuple(
     (prefix + suffix, mask, WHITESPACE_BYTES, b"text/html")
     for prefix, mask, in (
-        (b"<!DOCTYPE HTML", b'\xff\xff\xdf\xdf\xdf\xdf\xdf\xdf\xdf\xff\xdf\xdf\xdf\xdf\xff'),
-        (b'<HTML', b'\xff\xdf\xdf\xdf\xdf\xff'),
-        (b'<HEAD', b'\xff\xdf\xdf\xdf\xdf\xff'),
-        (b'<SCRIPT', b'\xff\xdf\xdf\xdf\xdf\xdf\xdf\xff'),
-        (b'<IFRAME', b'\xff\xdf\xdf\xdf\xdf\xdf\xdf\xff'),
-        (b'<H1', b'\xff\xdf\xff\xff'),
-        (b'<DIV', b'\xff\xdf\xdf\xdf\xff'),
-        (b'<FONT', b'\xff\xdf\xdf\xdf\xdf\xff'),
-        (b'<TABLE', b'\xff\xdf\xdf\xdf\xdf\xdf\xff'),
-        (b'<A', b'\xff\xdf\xff'),
-        (b'<STYLE', b'\xff\xdf\xdf\xdf\xdf\xdf\xff'),
-        (b'<TITLE', b'\xff\xdf\xdf\xdf\xdf\xdf\xff'),
-        (b'<B', b'\xff\xdf\xff'),
-        (b'<BODY', b'\xff\xdf\xdf\xdf\xdf\xff'),
-        (b'<BR', b'\xff\xdf\xdf\xff'),
-        (b'<P', b'\xff\xdf\xff'),
-        (b'<!--', b'\xff\xff\xff\xff\xff')
+        (b"<!DOCTYPE HTML", b"\xff\xff\xdf\xdf\xdf\xdf\xdf\xdf\xdf\xff\xdf\xdf\xdf\xdf\xff"),
+        (b"<HTML", b"\xff\xdf\xdf\xdf\xdf\xff"),
+        (b"<HEAD", b"\xff\xdf\xdf\xdf\xdf\xff"),
+        (b"<SCRIPT", b"\xff\xdf\xdf\xdf\xdf\xdf\xdf\xff"),
+        (b"<IFRAME", b"\xff\xdf\xdf\xdf\xdf\xdf\xdf\xff"),
+        (b"<H1", b"\xff\xdf\xff\xff"),
+        (b"<DIV", b"\xff\xdf\xdf\xdf\xff"),
+        (b"<FONT", b"\xff\xdf\xdf\xdf\xdf\xff"),
+        (b"<TABLE", b"\xff\xdf\xdf\xdf\xdf\xdf\xff"),
+        (b"<A", b"\xff\xdf\xff"),
+        (b"<STYLE", b"\xff\xdf\xdf\xdf\xdf\xdf\xff"),
+        (b"<TITLE", b"\xff\xdf\xdf\xdf\xdf\xdf\xff"),
+        (b"<B", b"\xff\xdf\xff"),
+        (b"<BODY", b"\xff\xdf\xdf\xdf\xdf\xff"),
+        (b"<BR", b"\xff\xdf\xdf\xff"),
+        (b"<P", b"\xff\xdf\xff"),
+        (b"<!--", b"\xff\xff\xff\xff\xff"),
     )
     for suffix in (b"\x20", b"\x3E")
 )
 TEXT_PATTERNS_2 = (
-    (b'<?xml', b'\xff\xff\xff\xff\xff', WHITESPACE_BYTES, b"text/xml"),
-    (b'%PDF-', b'\xff\xff\xff\xff\xff', None, b"application/pdf")
-    )
+    (b"<?xml", b"\xff\xff\xff\xff\xff", WHITESPACE_BYTES, b"text/xml"),
+    (b"%PDF-", b"\xff\xff\xff\xff\xff", None, b"application/pdf"),
+)
 
 #: Section 7.1, step 2
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
