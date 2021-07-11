@@ -215,5 +215,5 @@ class TestUtils:
         assert get_archive_mime(b"\x00\x00\x00\x00") is None
 
     def test_contains_binary(self):
-        assert contains_binary(b"\x00\x01") == True
-        assert contains_binary(b"\x09\x0a") == False
+        assert contains_binary(b"\x00\x01")
+        assert not contains_binary(b"\x09\x0a")

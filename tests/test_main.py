@@ -1,6 +1,6 @@
 import pytest
 
-from xtractmime import extract_mime
+from xtractmime import _find_unknown_mimetype, _sniff_mislabled_binary, extract_mime
 
 
 class TestMain:
@@ -33,3 +33,35 @@ class TestMain:
             )
             == expected
         )
+
+    @pytest.mark.parametrize(
+        "input_bytes,expected",
+        [
+            ("foo.txt", b"text/plain"),
+            ("foo.exe", b"application/octet-stream"),
+            (b"\xfe\xff", b"text/plain"),
+        ],
+    )
+    def test_sniff_mislabled_binary(self, input_bytes, expected):
+        if isinstance(input_bytes, str):
+            with open(f"tests/files/{input_bytes}", "rb") as input_file:
+                input_bytes = input_file.read()
+        assert _sniff_mislabled_binary(input_bytes) == expected
+
+    @pytest.mark.parametrize(
+        "input_bytes,sniff_scriptable,extra_types,expected",
+        [
+            ("foo.pdf", True, None, b"application/pdf"),
+            ("foo.gif", False, None, b"image/gif"),
+            ("foo.mp4", False, None, b"video/mp4"),
+            ("foo.zip", False, None, b"application/zip"),
+            ("foo.txt", False, None, b"text/plain"),
+            ("foo.exe", False, None, b"application/octet-stream"),
+            (b"test", False, ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),), b"text/test"),
+        ],
+    )
+    def test_find_unknown_mimetype(self, input_bytes, sniff_scriptable, extra_types, expected):
+        if isinstance(input_bytes, str):
+            with open(f"tests/files/{input_bytes}", "rb") as input_file:
+                input_bytes = input_file.read()
+        assert _find_unknown_mimetype(input_bytes, sniff_scriptable, extra_types) == expected
