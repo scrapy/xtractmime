@@ -1,5 +1,5 @@
 from struct import unpack
-from typing import Optional, Set, Tuple, Union
+from typing import Optional, Set, Tuple
 
 from xtractmime._patterns import (
     ARCHIVE_PATTERNS,
@@ -316,7 +316,7 @@ def get_text_mime(input_bytes: bytes) -> Optional[bytes]:
 
 def get_extra_mime(
     input_bytes: bytes,
-    extra_types: Optional[Tuple[Tuple[bytes, bytes, Union[Set[bytes], None], bytes], ...]],
+    extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]],
 ) -> Optional[bytes]:
     for pattern in EXTRA_PATTERNS:
         if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
