@@ -103,7 +103,7 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[
                     if not input_bytes[index : index + 1]:
                         return supplied_type
 
-                    if input_bytes[index : index + 3] == b">":
+                    if input_bytes[index : index + 1] == b">":
                         index += 1
                         loop_break = True
                         break
@@ -119,7 +119,7 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[
                     if not input_bytes[index : index + 1]:
                         return supplied_type
 
-                    if input_bytes[index : index + 2] == "?>":
+                    if input_bytes[index : index + 2] == b"?>":
                         index += 2
                         loop_break = True
                         break

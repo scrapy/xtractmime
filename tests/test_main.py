@@ -1,9 +1,61 @@
 import pytest
 
-from xtractmime import _find_unknown_mimetype, _sniff_mislabled_binary, extract_mime
+from xtractmime import (
+    _find_unknown_mimetype,
+    _sniff_mislabled_binary,
+    _sniff_mislabled_feed,
+    extract_mime,
+)
 
 
 class TestMain:
+
+    sample_xml1 = b"""<?xml version = "1.0" encoding = "UTF-8" ?>
+                        <!--Sample xml comment-->
+                        <rss version="2.0">
+                        <class_list>
+                           <student>
+                              <name>XYZ</name>
+                              <grade>A</grade>
+                           </student>
+                        </class_list>"""
+
+    sample_xml2 = b"""<?xml version = "1.0" encoding = "UTF-8" ?>
+                        <feed xmlns="http://www.w3.org/2005/Atom">
+                        <class_list>
+                           <student>
+                              <name>XYZ</name>
+                              <grade>A</grade>
+                           </student>
+                        </class_list>"""
+
+    sample_xml3 = b"""<?xml version = "1.0" encoding = "UTF-8" ?>
+                        <!ELEMENT spec (front, body, back?)>
+                        <class_list>
+                           <student>
+                              <name>XYZ</name>
+                              <grade>A</grade>
+                           </student>
+                        </class_list>"""
+
+    sample_xml4 = b"""<?xml version="1.0" encoding="utf-8"?> 
+                        <rdf:RDF 
+                          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+                          xmlns:content="http://purl.org/rss/1.0/modules/content/"
+                          xmlns="http://purl.org/rss/1.0/"
+                        > 
+
+                        </rdf:RDF>"""
+
+    sample_xml5 = b"""<?xml version="1.0" encoding="utf-8"?> 
+                        <rdf:RDF 
+                          xmlns:content="http://purl.org/rss/1.0/modules/content/"
+                          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+                          xmlns="http://purl.org/rss/1.0/"
+                        > 
+
+                        </rdf:RDF>"""
+
     @pytest.mark.parametrize(
         "body,content_types,http_origin,no_sniff,supported_types,expected",
         [
@@ -65,3 +117,21 @@ class TestMain:
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
         assert _find_unknown_mimetype(input_bytes, sniff_scriptable, extra_types) == expected
+
+    @pytest.mark.parametrize(
+        "input_bytes,supplied_type,expected",
+        [
+            ("foo.xml", b"text/xml", b"text/xml"),
+            (sample_xml1, b"application/rss+xml", b"application/rss+xml"),
+            (sample_xml2, b"application/atom+xml", b"application/atom+xml"),
+            (sample_xml3, b"text/xml", b"text/xml"),
+            (sample_xml4, b"application/rss+xml", b"application/rss+xml"),
+            (sample_xml5, b"application/rss+xml", b"application/rss+xml"),
+            (b"test", b"text/test", b"text/test"),
+        ],
+    )
+    def test_sniff_mislabled_feed(self, input_bytes, supplied_type, expected):
+        if isinstance(input_bytes, str):
+            with open(f"tests/files/{input_bytes}", "rb") as input_file:
+                input_bytes = input_file.read()
+        assert _sniff_mislabled_feed(input_bytes, supplied_type) == expected
