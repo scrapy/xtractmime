@@ -115,7 +115,7 @@ ARCHIVE_PATTERNS = (
 
 #: Section 7.1, step 1
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
-TEXT_PATTERNS_1 = tuple(
+TEXT_PATTERNS = tuple(
     (prefix + suffix, mask, WHITESPACE_BYTES, b"text/html")
     for prefix, mask, in (
         (b"<!DOCTYPE HTML", b"\xff\xff\xdf\xdf\xdf\xdf\xdf\xdf\xdf\xff\xdf\xdf\xdf\xdf\xff"),
@@ -137,8 +137,7 @@ TEXT_PATTERNS_1 = tuple(
         (b"<!--", b"\xff\xff\xff\xff\xff"),
     )
     for suffix in (b"\x20", b"\x3E")
-)
-TEXT_PATTERNS_2 = (
+) + (
     (b"<?xml", b"\xff\xff\xff\xff\xff", WHITESPACE_BYTES, b"text/xml"),
     (b"%PDF-", b"\xff\xff\xff\xff\xff", None, b"application/pdf"),
 )

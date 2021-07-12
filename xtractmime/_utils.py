@@ -8,8 +8,7 @@ from xtractmime._patterns import (
     EXTRA_PATTERNS,
     FONT_PATTERNS,
     IMAGE_PATTERNS,
-    TEXT_PATTERNS_1,
-    TEXT_PATTERNS_2,
+    TEXT_PATTERNS,
 )
 
 SAMPLE_RATES = (44100, 48000, 32000)
@@ -308,11 +307,7 @@ def get_archive_mime(input_bytes: bytes) -> Optional[bytes]:
 
 
 def get_text_mime(input_bytes: bytes) -> Optional[bytes]:
-    for pattern in TEXT_PATTERNS_1:
-        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
-            return pattern[3]
-
-    for pattern in TEXT_PATTERNS_2:
+    for pattern in TEXT_PATTERNS:
         if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
