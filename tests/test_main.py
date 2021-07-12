@@ -44,7 +44,6 @@ class TestMain:
                           xmlns:content="http://purl.org/rss/1.0/modules/content/"
                           xmlns="http://purl.org/rss/1.0/"
                         > 
-
                         </rdf:RDF>"""
 
     sample_xml5 = b"""<?xml version="1.0" encoding="utf-8"?> 
@@ -53,7 +52,6 @@ class TestMain:
                           xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
                           xmlns="http://purl.org/rss/1.0/"
                         > 
-
                         </rdf:RDF>"""
 
     @pytest.mark.parametrize(
@@ -128,6 +126,15 @@ class TestMain:
             (sample_xml4, b"application/rss+xml", b"application/rss+xml"),
             (sample_xml5, b"application/rss+xml", b"application/rss+xml"),
             (b"test", b"text/test", b"text/test"),
+            (b" ", None, None),
+            (b"<", None, None),
+            (b"<!--", None, None),
+            (b"<!", None, None),
+            (b"<?", None, None),
+            (b"<rdf:RDF", None, None),
+            (b"<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'", None, None),
+            (b"<rdf:RDF xmlns:content='http://purl.org/rss/1.0/modules/content/'", None, None),
+            (b"", None, None),
         ],
     )
     def test_sniff_mislabled_feed(self, input_bytes, supplied_type, expected):
