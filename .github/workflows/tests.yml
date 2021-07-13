@@ -7,7 +7,7 @@ jobs:
     name: "Test: py${{ matrix.python-version }}, Ubuntu"
     runs-on: ubuntu-latest
     strategy:
-      fail-test: false
+      fail-fast: false
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9]
 
@@ -32,7 +32,7 @@ jobs:
     name: "Test: py3.8, ${{ matrix.os }}"
     runs-on: "${{ matrix.os }}"
     strategy:
-      fail-test: false
+      fail-fast: false
       matrix:
         os: [macos-latest, windows-latest]
 
