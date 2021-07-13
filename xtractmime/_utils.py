@@ -64,15 +64,12 @@ def is_match_mime_pattern(
     input_index, pattern_index = 0, 0
 
     if lstrip:
-        while (
-            input_index < input_size
-            and input_bytes[input_index : input_index + 1] in lstrip  # noqa: E203
-        ):
+        while input_index < input_size and input_bytes[input_index : input_index + 1] in lstrip:
             input_index += 1
 
     while pattern_index < pattern_size:
         masked_byte = bytes([input_bytes[input_index] & pattern_mask[pattern_index]])
-        if masked_byte != byte_pattern[pattern_index : pattern_index + 1]:  # noqa: E203
+        if masked_byte != byte_pattern[pattern_index : pattern_index + 1]:
             return False
         input_index += 1
         pattern_index += 1
@@ -98,7 +95,7 @@ def is_mp4_signature(input_bytes: bytes) -> bool:
 
     bytes_read = 16
     while bytes_read < box_size:
-        if input_bytes[bytes_read : bytes_read + 3] == b"mp4":  # noqa: E203
+        if input_bytes[bytes_read : bytes_read + 3] == b"mp4":
             return True
         bytes_read += 4
 
@@ -146,7 +143,7 @@ def is_webm_signature(input_bytes: bytes) -> bool:
 
     limit = min(input_size, 38)
     while index < limit:
-        if input_bytes[index : index + 2] == b"B\x82":  # noqa: E203
+        if input_bytes[index : index + 2] == b"B\x82":
             index += 2
 
             if index >= input_size:
@@ -158,7 +155,7 @@ def is_webm_signature(input_bytes: bytes) -> bool:
             if index >= input_size - 4:
                 break
 
-            if input_bytes[index : index + 4] == b"webm":  # noqa: E203
+            if input_bytes[index : index + 4] == b"webm":
                 return True
         index += 1
 
@@ -170,7 +167,7 @@ def match_mp3_header(input_bytes: bytes, input_size: int, index: int) -> bool:
         return False
 
     if (
-        input_bytes[index : index + 1] != b"\xff"  # noqa: E203
+        input_bytes[index : index + 1] != b"\xff"
         or bytes([input_bytes[index + 1] & 224]) != b"\xe0"
     ):
         return False

@@ -63,31 +63,31 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[
 
     while index < input_size:
         while True:
-            print(input_bytes[index : index + 1])  # noqa: E203
-            if not input_bytes[index : index + 1]:  # noqa: E203
+            print(input_bytes[index : index + 1])
+            if not input_bytes[index : index + 1]:
                 return supplied_type
 
-            if input_bytes[index : index + 1] == b"<":  # noqa: E203
+            if input_bytes[index : index + 1] == b"<":
                 index += 1
                 break
 
-            if input_bytes[index : index + 1] not in WHITESPACE_BYTES:  # noqa: E203
+            if input_bytes[index : index + 1] not in WHITESPACE_BYTES:
                 return supplied_type
 
             index += 1
 
         while True:
             loop_break = False
-            if not input_bytes[index : index + 1]:  # noqa: E203
+            if not input_bytes[index : index + 1]:
                 return supplied_type
 
-            if input_bytes[index : index + 3] == b"!--":  # noqa: E203
+            if input_bytes[index : index + 3] == b"!--":
                 index += 3
                 while True:
-                    if not input_bytes[index : index + 1]:  # noqa: E203
+                    if not input_bytes[index : index + 1]:
                         return supplied_type
 
-                    if input_bytes[index : index + 3] == b"-->":  # noqa: E203
+                    if input_bytes[index : index + 3] == b"-->":
                         index += 3
                         loop_break = True
                         break
@@ -97,13 +97,13 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[
             if loop_break:
                 break
 
-            if input_bytes[index : index + 1] == b"!":  # noqa: E203
+            if input_bytes[index : index + 1] == b"!":
                 index += 1
                 while True:
-                    if not input_bytes[index : index + 1]:  # noqa: E203
+                    if not input_bytes[index : index + 1]:
                         return supplied_type
 
-                    if input_bytes[index : index + 1] == b">":  # noqa: E203
+                    if input_bytes[index : index + 1] == b">":
                         index += 1
                         loop_break = True
                         break
@@ -113,13 +113,13 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[
             if loop_break:
                 break
 
-            if input_bytes[index : index + 1] == b"?":  # noqa: E203
+            if input_bytes[index : index + 1] == b"?":
                 index += 1
                 while True:
-                    if not input_bytes[index : index + 1]:  # noqa: E203
+                    if not input_bytes[index : index + 1]:
                         return supplied_type
 
-                    if input_bytes[index : index + 2] == b"?>":  # noqa: E203
+                    if input_bytes[index : index + 2] == b"?>":
                         index += 2
                         loop_break = True
                         break
@@ -129,29 +129,26 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[
             if loop_break:
                 break
 
-            if input_bytes[index : index + 3] == b"rss":  # noqa: E203
+            if input_bytes[index : index + 3] == b"rss":
                 return b"application/rss+xml"
 
-            if input_bytes[index : index + 4] == b"feed":  # noqa: E203
+            if input_bytes[index : index + 4] == b"feed":
                 return b"application/atom+xml"
 
-            if input_bytes[index : index + 7] == b"rdf:RDF":  # noqa: E203
+            if input_bytes[index : index + 7] == b"rdf:RDF":
                 index += 7
                 while True:
-                    if not input_bytes[index : index + 1]:  # noqa: E203
+                    if not input_bytes[index : index + 1]:
                         return supplied_type
 
-                    if (
-                        input_bytes[index : index + 24]  # noqa: E203
-                        == b"http://purl.org/rss/1.0/"
-                    ):
+                    if input_bytes[index : index + 24] == b"http://purl.org/rss/1.0/":
                         index += 24
                         while True:
-                            if not input_bytes[index : index + 1]:  # noqa: E203
+                            if not input_bytes[index : index + 1]:
                                 return supplied_type
 
                             if (
-                                input_bytes[index : index + 43]  # noqa: E203
+                                input_bytes[index : index + 43]
                                 == b"http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                             ):
                                 return b"application/rss+xml"
@@ -159,18 +156,15 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[
                             index += 1
 
                     if (
-                        input_bytes[index : index + 43]  # noqa: E203
+                        input_bytes[index : index + 43]
                         == b"http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                     ):
                         index += 43
                         while True:
-                            if not input_bytes[index : index + 1]:  # noqa: E203
+                            if not input_bytes[index : index + 1]:
                                 return supplied_type
 
-                            if (
-                                input_bytes[index : index + 24]  # noqa: E203
-                                == b"http://purl.org/rss/1.0/"
-                            ):
+                            if input_bytes[index : index + 24] == b"http://purl.org/rss/1.0/":
                                 return b"application/rss+xml"
 
                             index += 1
