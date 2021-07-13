@@ -1,9 +1,21 @@
 import setuptools
 
 
+with open("README.md", "r", encoding="utf-8") as desc:
+    long_description = desc.read()
+
+
 setuptools.setup(
     name="xtractmime",
     version="0.0.0",
+    license="BSD",
+    description=(
+        "Implementation of the MIME Sniffing standard  (https://mimesniff.spec.whatwg.org/)"
+    ),
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    author="Akshay Sharma",
+    author_email="akshaysharmajs@gmail.com",
     url="https://github.com/scrapy/xtractmime",
     packages=["xtractmime"],
     python_requires=">=3.6",
