@@ -1,3 +1,5 @@
+from typing import Optional, Set, Tuple
+
 _APACHE_TYPES = [
     b"text/plain",
     b"text/plain; charset=ISO-8859-1",
@@ -144,7 +146,7 @@ TEXT_PATTERNS = tuple(
 
 #: Section 7.1, step 2
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
-EXTRA_PATTERNS = (
+EXTRA_PATTERNS: Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...] = (
     (
         b"%!PS-Adobe-",
         b"\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff",
