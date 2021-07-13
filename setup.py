@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as desc:
 
 setuptools.setup(
     name="xtractmime",
-    version="1.0.0",
+    version="0.0.0",
     license="BSD",
     description=(
         "Implementation of the MIME Sniffing standard  (https://mimesniff.spec.whatwg.org/)"

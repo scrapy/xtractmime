@@ -1,5 +1,5 @@
 __version__ = "0.0.0"
-from typing import Optional, Set, Tuple, Union
+from typing import Optional, Set, Tuple
 
 _APACHE_TYPES = [
     b"text/plain",
@@ -26,15 +26,12 @@ def _is_match_mime_pattern(
     input_index, pattern_index = 0, 0
 
     if lstrip:
-        while (
-            input_index < input_size
-            and input_bytes[input_index : input_index + 1] in lstrip  # noqa: E203
-        ):
+        while input_index < input_size and input_bytes[input_index : input_index + 1] in lstrip:
             input_index += 1
 
     while pattern_index < pattern_size:
         masked_byte = bytes([input_bytes[input_index] & pattern_mask[pattern_index]])
-        if masked_byte != byte_pattern[pattern_index : pattern_index + 1]:  # noqa: E203
+        if masked_byte != byte_pattern[pattern_index : pattern_index + 1]:
             return False
         input_index += 1
         pattern_index += 1
@@ -45,10 +42,10 @@ def _is_match_mime_pattern(
 def extract_mime(
     body: bytes,
     *,
-    content_types: Optional[Tuple[Union[bytes, str]]] = None,
+    content_types: Optional[Tuple[bytes]] = None,
     http_origin: bool = True,
     no_sniff: bool = False,
-    extra_types: Optional[Tuple[Tuple[bytes, bytes, Set[bytes], Union[bytes, str]], ...]] = None,
-) -> bytes:
+    extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]] = None,
+) -> Optional[bytes]:
 
     return b"mimetype"
