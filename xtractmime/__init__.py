@@ -9,6 +9,7 @@ from xtractmime._utils import (
     get_image_mime,
     get_text_mime,
 )
+from xtractmime.mimegroups import is_audio_video_mime_type, is_html_mime_type, is_image_mime_type
 
 
 def _find_unknown_mimetype(
@@ -202,17 +203,16 @@ def extract_mime(
     if supplied_type.endswith(b"+xml") or supplied_type in {b"text/xml", b"application/xml"}:
         return supplied_type
 
-    if supplied_type == b"text/html":
+    if is_html_mime_type(supplied_type):
         return _sniff_mislabled_feed(resource_header, supplied_type)
 
     if supported_types:
-        if supplied_type.startswith(b"image/"):
+        if is_image_mime_type(supplied_type):
             matched_type = get_image_mime(resource_header)
             if matched_type in supported_types:
                 return matched_type
 
-        video_types = (b"audio/", b"video/")
-        if supplied_type.startswith(video_types) or supplied_type == b"application/ogg":
+        if is_audio_video_mime_type(supplied_type):
             matched_type = get_audio_video_mime(resource_header)
             if matched_type in supported_types:
                 return matched_type
