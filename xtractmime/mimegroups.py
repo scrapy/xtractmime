@@ -14,7 +14,7 @@ def is_font_mime_type(mime_type: bytes) -> bool:
     return mime_type.startswith(b"font/") or mime_type in FONT_TYPES
 
 
-def is_zip_based_mime_type(mime_type: bytes) -> bool:
+def is_zip_mime_type(mime_type: bytes) -> bool:
     return mime_type.endswith(b"+zip") or mime_type == b"application/zip"
 
 
