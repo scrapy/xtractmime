@@ -14,10 +14,14 @@ ALL_MIME_GROUPS = {
     "mime_type,mime_groups",
     [
         (b"image/foo", {"image"}),
+        (b"image/x-icon", {"image"}),
         (b"audio/foo", {"audio_video"}),
+        (b"audio/basic", {"audio_video"}),
         (b"video/foo", {"audio_video"}),
+        (b"video/avi", {"audio_video"}),
         (b"application/ogg", {"audio_video"}),
         (b"font/foo", {"font"}),
+        (b"application/vnd.ms-fontobject", {"font"}),
         (b"application/font-cff", {"font"}),
         (b"application/foo+zip", {"zip"}),
         (b"application/zip", {"zip", "archive"}),
@@ -29,6 +33,9 @@ ALL_MIME_GROUPS = {
         (b"application/ecmascript", {"javascript"}),
         (b"application/foo+json", {"json"}),
         (b"text/json", {"json"}),
+        (b"application/postscript", {"text"}),
+        (b"text/plain", {"text"}),
+        (b"text/plain; charset=ISO-8859-1", {"text"}),
     ],
 )
 def test_mime_group(mime_type, mime_groups):

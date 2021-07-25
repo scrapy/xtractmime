@@ -1,4 +1,10 @@
-from xtractmime._patterns import ARCHIVE_TYPES, FONT_TYPES, JAVASCRIPT_TYPES
+from xtractmime._patterns import (
+    _APACHE_TYPES,
+    ARCHIVE_TYPES,
+    EXTRA_PATTERNS,
+    FONT_TYPES,
+    JAVASCRIPT_TYPES,
+)
 
 
 def is_image_mime_type(mime_type: bytes) -> bool:
@@ -46,3 +52,8 @@ def is_javascript_mime_type(mime_type: bytes) -> bool:
 
 def is_json_mime_type(mime_type: bytes) -> bool:
     return mime_type.endswith(b"+json") or mime_type in (b"application/json", b"text/json")
+
+
+def is_text_mime_type(mime_type: bytes) -> bool:
+    text_types = tuple(text_type[3] for text_type in EXTRA_PATTERNS)
+    return mime_type in _APACHE_TYPES or mime_type in text_types
