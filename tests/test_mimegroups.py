@@ -34,8 +34,9 @@ ALL_MIME_GROUPS = {
         (b"application/foo+json", {"json"}),
         (b"text/json", {"json"}),
         (b"application/postscript", {"text"}),
-        (b"text/plain", {"text"}),
-        (b"text/plain; charset=ISO-8859-1", {"text"}),
+        (b"text/plain", {}),
+        (b"text/plain; charset=ISO-8859-1", {}),
+        (b"application/octet-stream", {}),
     ],
 )
 def test_mime_group(mime_type, mime_groups):
