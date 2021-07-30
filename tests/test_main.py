@@ -65,6 +65,9 @@ class TestMain:
             ("foo.gif", (b"image/gif",), True, False, (b"image/gif",), b"image/gif"),
             ("foo.mp4", (b"video/mp4",), True, False, (b"video/mp4",), b"video/mp4"),
             (b"\x00\x00\x00\x00", (b"text/test",), True, False, None, b"text/test"),
+            (b"", (b"text/html; charset=utf-8",), True, False, None, b"text/html"),
+            (b"", (b"text/htmlpdfthing",), True, False, None, b"text/htmlpdfthing"),
+            (b"", None, True, False, None, b"text/plain"),
         ],
     )
     def test_extract_mime(
