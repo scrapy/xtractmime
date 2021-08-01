@@ -1,12 +1,5 @@
 from typing import Optional, Set, Tuple
 
-_APACHE_TYPES = [
-    b"text/plain",
-    b"text/plain; charset=ISO-8859-1",
-    b"text/plain; charset=iso-8859-1",
-    b"text/plain; charset=UTF-8",
-]
-WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
 
 #: Section 3
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#terminology  # noqa: E501
@@ -39,6 +32,51 @@ BINARY_BYTES = (
     b"\x1e",
     b"\x1f",
 )
+WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
+
+#: Section 4.6
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#mime-type-groups  # noqa: E501
+FONT_TYPES = [
+    b"application/font-cff",
+    b"application/font-off",
+    b"application/font-sfnt",
+    b"application/font-ttf",
+    b"application/font-woff",
+    b"application/vnd.ms-fontobject",
+    b"application/vnd.ms-opentype",
+]
+ARCHIVE_TYPES = [
+    b"application/x-rar-compressed",
+    b"application/zip",
+    b"application/x-gzip",
+]
+JAVASCRIPT_TYPES = [
+    b"application/ecmascript",
+    b"application/javascript",
+    b"application/x-ecmascript",
+    b"application/x-javascript",
+    b"text/ecmascript",
+    b"text/javascript",
+    b"text/javascript1.0",
+    b"text/javascript1.1",
+    b"text/javascript1.2",
+    b"text/javascript1.3",
+    b"text/javascript1.4",
+    b"text/javascript1.5",
+    b"text/jscript",
+    b"text/livescript",
+    b"text/x-ecmascript",
+    b"text/x-javascript",
+]
+
+#: Section 5.1, step 2
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#interpreting-the-resource-metadata  # noqa: E501
+_APACHE_TYPES = [
+    b"text/plain",
+    b"text/plain; charset=ISO-8859-1",
+    b"text/plain; charset=iso-8859-1",
+    b"text/plain; charset=UTF-8",
+]
 
 #: Section 6.1, step 1
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-image-type-pattern  # noqa: E501
