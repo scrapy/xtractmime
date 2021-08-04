@@ -30,6 +30,11 @@ and many more...
 
 ## Basic usage
 
+### funtion `xtractmime.extract_mime(body: bytes, *, content_types: Optional[Tuple[bytes]] = None, http_origin: bool = True, no_sniff: bool = 	False, extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]] = None, supported_types: Set[bytes] = None) -> Optional[bytes]`
+
+Return `mimetype` as a byte string if the byte sequence in the provided content is recognized by `xtractmime`
+else return `None`
+
 Below mentioned is a simple example of using `xtractmime.extract_mime` to 
 determine mime type of a text content as input.
 
@@ -38,4 +43,5 @@ determine mime type of a text content as input.
 >>> body = b"Sample text content"
 >>> extract_mime(body)
 b'text/plain'
+>>>
 ```
