@@ -63,7 +63,7 @@ b'text/html'
 
 
 Optional `http_origin` argument is a flag to determine if the resource is retrieved via HTTP or not.
-`http_origin` is true (by default) for HTTP responses else false.
+`http_origin` is *`True`* (by default) for HTTP responses else *`False`*.
 
 Example using `http_origin` argument:
 
@@ -75,4 +75,22 @@ Example using `http_origin` argument:
 b'application/octet-stream'
 >>> extract_mime(body, content_types=content_types, http_origin=False)
 b'text/plain'
+```
+
+
+Optional `no_sniff` argument is a flag which is *`True`* if the user agent does not wish to
+perform sniffing on the resource and *`False`* (by default) otherwise. The flag is suitable
+for using as a `X-Content-Type-Options` header.
+
+Example using `no_sniff` argument:
+
+```python
+>>> from xtractmime import extract_mime
+>>> body = b'Sample text content'
+>>> content_types = (b'text/html',)
+>>> extract_mime(body, no_sniff=False)
+b'text/plain'
+>>> extract_mime(body, content_types=content_types, no_sniff=True)
+b'text/html'
+>>> 
 ```
