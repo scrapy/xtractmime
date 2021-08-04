@@ -1,12 +1,17 @@
 import pytest
 
 from unittest import mock
+from xtractmime._utils import is_match_mime_pattern
+from xtractmime._patterns import WHITESPACE_BYTES
 
 from xtractmime._utils import (
-    is_archive,
-    is_audio_video,
-    is_font,
-    is_image,
+    contains_binary,
+    get_archive_mime,
+    get_audio_video_mime,
+    get_extra_mime,
+    get_font_mime,
+    get_image_mime,
+    get_text_mime,
     is_mp3_non_ID3_signature,
     is_mp4_signature,
     is_webm_signature,
@@ -30,6 +35,40 @@ class TestUtils:
 
     with open("tests/files/foo.gif", "rb") as fp:
         body_gif = fp.read()
+
+    input_bytes = b"GIF87a" + bytes.fromhex("401f7017f70000")
+
+    @pytest.mark.parametrize(
+        "input_bytes,byte_pattern,pattern_mask,lstrip,expected",
+        [
+            (input_bytes, b"GIF87a", b"\xff\xff\xff\xff\xff\xff", None, True),
+            (input_bytes, b"GIF87a", b"\xff\xff\xff\xff\xff", None, ValueError),
+            (b" \t\n\rGIF87a", b"GIF87a", b"\xff\xff\xff\xff\xff\xff", WHITESPACE_BYTES, True),
+            (b"GIF", b"GIF87a", b"\xff\xff\xff\xff\xff\xff", None, False),
+            (b"\xff\xff\xff\xff\xff\xff", b"GIF87a", b"\xff\xff\xff\xff\xff\xff", None, False),
+        ],
+    )
+    def test_is_match_mime_pattern(
+        self, input_bytes, byte_pattern, pattern_mask, lstrip, expected
+    ):
+        if type(expected) == type and issubclass(expected, Exception):
+            with pytest.raises(expected):
+                is_match_mime_pattern(
+                    input_bytes=input_bytes,
+                    byte_pattern=byte_pattern,
+                    pattern_mask=pattern_mask,
+                    lstrip=lstrip,
+                )
+        else:
+            assert (
+                is_match_mime_pattern(
+                    input_bytes=input_bytes,
+                    byte_pattern=byte_pattern,
+                    pattern_mask=pattern_mask,
+                    lstrip=lstrip,
+                )
+                == expected
+            )
 
     @pytest.mark.parametrize(
         "input_bytes,expected",
@@ -133,16 +172,48 @@ class TestUtils:
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
-        assert is_audio_video(input_bytes) == expected
+        assert get_audio_video_mime(input_bytes) == expected
+
+    @pytest.mark.parametrize(
+        "input_bytes,expected",
+        [
+            ("foo.html", b"text/html"),
+            ("foo.pdf", b"application/pdf"),
+            (b"\x00\x00\x00\x00", None),
+        ],
+    )
+    def test_text(self, input_bytes, expected):
+        if isinstance(input_bytes, str):
+            with open(f"tests/files/{input_bytes}", "rb") as input_file:
+                input_bytes = input_file.read()
+        assert get_text_mime(input_bytes) == expected
+
+    @pytest.mark.parametrize(
+        "input_bytes,extra_types,expected",
+        [
+            ("foo.ps", None, b"application/postscript"),
+            (b"test", ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),), b"text/test"),
+            (b"\x00\x00\x00\x00", None, None),
+        ],
+    )
+    def test_extra(self, input_bytes, extra_types, expected):
+        if isinstance(input_bytes, str):
+            with open(f"tests/files/{input_bytes}", "rb") as input_file:
+                input_bytes = input_file.read()
+        assert get_extra_mime(input_bytes, extra_types) == expected
 
     def test_image(self):
-        assert is_image(self.body_gif) == b"image/gif"
-        assert is_image(b"\x00\x00\x00\x00") is None
+        assert get_image_mime(self.body_gif) == b"image/gif"
+        assert get_image_mime(b"\x00\x00\x00\x00") is None
 
     def test_font(self):
-        assert is_font(self.body_ttf) == b"font/ttf"
-        assert is_font(b"\x00\x00\x00\x00") is None
+        assert get_font_mime(self.body_ttf) == b"font/ttf"
+        assert get_font_mime(b"\x00\x00\x00\x00") is None
 
     def test_archive(self):
-        assert is_archive(self.body_zip) == b"application/zip"
-        assert is_archive(b"\x00\x00\x00\x00") is None
+        assert get_archive_mime(self.body_zip) == b"application/zip"
+        assert get_archive_mime(b"\x00\x00\x00\x00") is None
+
+    def test_contains_binary(self):
+        assert contains_binary(b"\x00\x01")
+        assert not contains_binary(b"\x09\x0a")

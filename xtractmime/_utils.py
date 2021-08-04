@@ -1,12 +1,14 @@
 from struct import unpack
-from typing import Optional, Tuple
+from typing import Optional, Set, Tuple
 
-from xtractmime import _is_match_mime_pattern
 from xtractmime._patterns import (
     ARCHIVE_PATTERNS,
     AUDIO_VIDEO_PATTERNS,
+    BINARY_BYTES,
+    EXTRA_PATTERNS,
     FONT_PATTERNS,
     IMAGE_PATTERNS,
+    TEXT_PATTERNS,
 )
 
 SAMPLE_RATES = (44100, 48000, 32000)
@@ -46,6 +48,35 @@ MP3_RATES = (
 )
 
 
+def is_match_mime_pattern(
+    input_bytes: bytes, byte_pattern: bytes, pattern_mask: bytes, lstrip: Set[bytes] = None
+) -> bool:
+    input_size = len(input_bytes)
+    pattern_size = len(byte_pattern)
+    mask_size = len(pattern_mask)
+
+    if pattern_size != mask_size:
+        raise ValueError("pattern's length should match mask's length")
+
+    if input_size < pattern_size:
+        return False
+
+    input_index, pattern_index = 0, 0
+
+    if lstrip:
+        while input_index < input_size and input_bytes[input_index : input_index + 1] in lstrip:
+            input_index += 1
+
+    while pattern_index < pattern_size:
+        masked_byte = bytes([input_bytes[input_index] & pattern_mask[pattern_index]])
+        if masked_byte != byte_pattern[pattern_index : pattern_index + 1]:
+            return False
+        input_index += 1
+        pattern_index += 1
+
+    return True
+
+
 def is_mp4_signature(input_bytes: bytes) -> bool:
     input_size = len(input_bytes)
     if input_size < 12:
@@ -64,7 +95,7 @@ def is_mp4_signature(input_bytes: bytes) -> bool:
 
     bytes_read = 16
     while bytes_read < box_size:
-        if input_bytes[bytes_read : bytes_read + 3] == b"mp4":  # noqa: E203
+        if input_bytes[bytes_read : bytes_read + 3] == b"mp4":
             return True
         bytes_read += 4
 
@@ -112,7 +143,7 @@ def is_webm_signature(input_bytes: bytes) -> bool:
 
     limit = min(input_size, 38)
     while index < limit:
-        if input_bytes[index : index + 2] == b"B\x82":  # noqa: E203
+        if input_bytes[index : index + 2] == b"B\x82":
             index += 2
 
             if index >= input_size:
@@ -124,7 +155,7 @@ def is_webm_signature(input_bytes: bytes) -> bool:
             if index >= input_size - 4:
                 break
 
-            if input_bytes[index : index + 4] == b"webm":  # noqa: E203
+            if input_bytes[index : index + 4] == b"webm":
                 return True
         index += 1
 
@@ -136,7 +167,7 @@ def match_mp3_header(input_bytes: bytes, input_size: int, index: int) -> bool:
         return False
 
     if (
-        input_bytes[index : index + 1] != b"\xff"  # noqa: E203
+        input_bytes[index : index + 1] != b"\xff"
         or bytes([input_bytes[index + 1] & 224]) != b"\xe0"
     ):
         return False
@@ -231,17 +262,17 @@ def is_mp3_non_ID3_signature(input_bytes: bytes) -> bool:
         return False
 
 
-def is_image(input_bytes: bytes) -> Optional[bytes]:
+def get_image_mime(input_bytes: bytes) -> Optional[bytes]:
     for pattern in IMAGE_PATTERNS:
-        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     return None
 
 
-def is_audio_video(input_bytes: bytes) -> Optional[bytes]:
+def get_audio_video_mime(input_bytes: bytes) -> Optional[bytes]:
     for pattern in AUDIO_VIDEO_PATTERNS:
-        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     if is_mp4_signature(input_bytes):
@@ -256,17 +287,49 @@ def is_audio_video(input_bytes: bytes) -> Optional[bytes]:
     return None
 
 
-def is_font(input_bytes: bytes) -> Optional[bytes]:
+def get_font_mime(input_bytes: bytes) -> Optional[bytes]:
     for pattern in FONT_PATTERNS:
-        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     return None
 
 
-def is_archive(input_bytes: bytes) -> Optional[bytes]:
+def get_archive_mime(input_bytes: bytes) -> Optional[bytes]:
     for pattern in ARCHIVE_PATTERNS:
-        if _is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
 
     return None
+
+
+def get_text_mime(input_bytes: bytes) -> Optional[bytes]:
+    for pattern in TEXT_PATTERNS:
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+            return pattern[3]
+
+    return None
+
+
+def get_extra_mime(
+    input_bytes: bytes,
+    extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]],
+) -> Optional[bytes]:
+    for pattern in EXTRA_PATTERNS:
+        if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+            return pattern[3]
+
+    if extra_types:
+        for pattern in extra_types:
+            if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
+                return pattern[3]
+
+    return None
+
+
+def contains_binary(input_bytes: bytes) -> bool:
+    for i in input_bytes:
+        if bytes([i]) in BINARY_BYTES:
+            return True
+
+    return False
