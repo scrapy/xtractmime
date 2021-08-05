@@ -28,13 +28,12 @@ Additional functionality to check if a MIME type belongs to a specific MIME type
 methods mentioned in `xtractmime.mimegroups`:
 
 ```python
->>> from xtractmime.mimegroups import *
+>>> from xtractmime.mimegroups import is_html_mime_type, is_image_mime_type
 >>> mime_type = b'text/html'
 >>> is_html_mime_type(mime_type)
 True
 >>> is_image_mime_type(mime_type)
 False
->>>
 ```
 
 ---
