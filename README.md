@@ -18,19 +18,10 @@ Below mentioned are some simple examples of using `xtractmime.extract_mime`:
 
 ```python
 >>> from xtractmime import extract_mime
->>> body = b"Sample text content"
->>> extract_mime(body)
+>>> extract_mime(b'Sample text content')
 b'text/plain'
->>>
-```
-
-```python
->>> from xtractmime import extract_mime
->>> content_types = (b'text/html',)
->>> body = b''
->>> extract_mime(body, content_types=content_types)
+>>> extract_mime(b'', content_types=(b'text/html',))
 b'text/html'
->>> 
 ```
 
 Additional functionality to check if a mime type belongs to a specific mime type group using 
