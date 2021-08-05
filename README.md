@@ -24,8 +24,8 @@ b'text/plain'
 b'text/html'
 ```
 
-Additional functionality to check if a mime type belongs to a specific mime type group using 
-methods mentioned in `xtractmime.mimegroups`
+Additional functionality to check if a MIME type belongs to a specific MIME type group using 
+methods mentioned in `xtractmime.mimegroups`:
 
 ```python
 >>> from xtractmime.mimegroups import *
