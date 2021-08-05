@@ -10,15 +10,11 @@ Install from [`PyPI`](https://pypi.python.org/pypi/xtractmime):
 pip install xtractmime
 ```
 
+---
+
 ## Basic usage
 
-### function `xtractmime.extract_mime(body: bytes, *, content_types: Optional[Tuple[bytes]] = None, http_origin: bool = True, no_sniff: bool = 	False, extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]] = None, supported_types: Set[bytes] = None) -> Optional[bytes]`
-
-Return `mimetype` as a byte string if the byte sequence in the provided content is recognized by `xtractmime`
-else return `None`
-
-Below mentioned is a simple example of using `xtractmime.extract_mime` to 
-determine mime type of a text content as input:
+Below mentioned are some simple examples of using `xtractmime.extract_mime`:
 
 ```python
 >>> from xtractmime import extract_mime
@@ -27,13 +23,6 @@ determine mime type of a text content as input:
 b'text/plain'
 >>>
 ```
-
-
-Optional `content_types` argument is a tuple of mime types suitable for using as a `Content-Type` header.
-For the cases where the format of the content is unrecognizalble for `xtractmime`, it will return
-the last mime type in the provided tuple of mime types.
-
-Example using `content_types` argument:
 
 ```python
 >>> from xtractmime import extract_mime
@@ -44,11 +33,56 @@ b'text/html'
 >>> 
 ```
 
+Additional functionality to check if a mime type belongs to a specific mime type group using 
+methods mentioned in `xtractmime.mimegroups`
+
+```python
+>>> from xtractmime.mimegroups import *
+>>> mime_type = b'text/html'
+>>> is_html_mime_type(mime_type)
+True
+>>> is_image_mime_type(mime_type)
+False
+>>>
+```
+
+---
+
+## API Reference
+
+### function `xtractmime.extract_mime : Optional[bytes]`
+
+Return `mimetype` as a byte string if the byte sequence in the provided content is recognized by `xtractmime`
+else return `None`
+
+#### Parameters
+
+* `body: bytes`
+* `content_types: Optional[Tuple[bytes]], default = None`
+* `http_origin: bool, default = True`
+* `no_sniff: bool, default = False`
+* `extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]], default = None`
+* `supported_types: Set[bytes], default = None`
+
+Optional `content_types` argument is a tuple of mime types suitable for using as a `Content-Type` header.
+For the cases where the format of the content is unrecognizalble for `xtractmime`, it will return
+the last mime type in the provided tuple of mime types.
+
+**Example**
+
+```python
+>>> from xtractmime import extract_mime
+>>> content_types = (b'text/xml',)
+>>> body = b''
+>>> extract_mime(body, content_types=content_types)
+b'text/xml'
+>>> 
+```
 
 Optional `http_origin` argument is a flag to determine if the resource is retrieved via HTTP or not.
 `http_origin` is *`True`* (by default) for HTTP responses else *`False`*.
 
-Example using `http_origin` argument:
+**Example**
 
 ```python
 >>> from xtractmime import extract_mime
@@ -60,20 +94,25 @@ b'application/octet-stream'
 b'text/plain'
 ```
 
-
 Optional `no_sniff` argument is a flag which is *`True`* if the user agent does not wish to
 perform sniffing on the resource and *`False`* (by default) otherwise. The flag is suitable
 for using as a `X-Content-Type-Options` header.
 
-Example using `no_sniff` argument:
+**Example**
 
 ```python
 >>> from xtractmime import extract_mime
->>> body = b'Sample text content'
+>>> body = b"""<?xml version="1.0" encoding="utf-8"?>
+                        <rdf:RDF
+                          xmlns:content="http://purl.org/rss/1.0/modules/content/"
+                          xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                          xmlns="http://purl.org/rss/1.0/"
+                        >
+                        </rdf:RDF>"""
 >>> content_types = (b'text/html',)
->>> extract_mime(body, no_sniff=False)
-b'text/plain'
+>>> extract_mime(body, content_types=content_types, no_sniff=False)
+b'application/rss+xml'
 >>> extract_mime(body, content_types=content_types, no_sniff=True)
 b'text/html'
->>> 
+>>>
 ```
