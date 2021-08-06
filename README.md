@@ -170,6 +170,13 @@ one of the *Content-Type* headers mentioned in [Section 5.1](https://mimesniff.s
 
 Return a MIME type essence if the content is identified as a XML-based RSS feed or an Atom feed else return supplied MIME type. The function determines whether a feed has been mislabeled as HTML.
 
+### function `xtractmime.is_binary_data : bool`
+**Parameters:**
+
+* `input_bytes: bytes`
+
+Return *`True`* if the provided byte sequence contains any binary data bytes else *`False`*
+ 
 ### MIME group functions
 
 These functions provide an additional functionality to determine whether a MIME type belongs to a specific MIME type group or not.
