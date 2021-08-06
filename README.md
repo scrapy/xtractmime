@@ -50,8 +50,7 @@ False
 * `extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]], default = None`
 * `supported_types: Set[bytes], default = None`
 
-Return the [MIME type essence](https://mimesniff.spec.whatwg.org/#mime-type-essence) (e.g. `text/html`) if the byte sequence 
-in the provided content is recognized by `xtractmime` else return `None`
+Return the [MIME type essence](https://mimesniff.spec.whatwg.org/#mime-type-essence) (e.g. `text/html`) matching the input data, or `None` if no match can be found.
 
 
 Optional `content_types` argument is a tuple of mime types suitable for using as a `Content-Type` header.
