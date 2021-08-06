@@ -96,6 +96,7 @@ extra_types = ((b'test', b'\xff\xff\xff\xff', None, b'text/test'),...)
 
 *`xtractmime` apply some [restrictions](https://mimesniff.spec.whatwg.org/#ref-for-mime-type%E2%91%A1%E2%91%A8) to the additional MIME types for security reasons i.e. users should not implicitly include additional byte patterns for any MIME type already present in 
 `xtractmime`, as doing so could introduce privilege escalation vulnerabilities.*
+
 ---
 
 ### function `xtractmime.is_binary_data(input_bytes: bytes) -> bool`
