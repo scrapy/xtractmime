@@ -5,6 +5,7 @@ from xtractmime import (
     _sniff_mislabled_binary,
     _sniff_mislabled_feed,
     extract_mime,
+    is_binary_data,
 )
 
 
@@ -145,3 +146,7 @@ class TestMain:
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
         assert _sniff_mislabled_feed(input_bytes, supplied_type) == expected
+
+    def test_is_binary_data(self):
+        assert is_binary_data(b"\x00\x01")
+        assert not is_binary_data(b"\x09\x0a")
