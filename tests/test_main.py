@@ -54,6 +54,8 @@ class TestMain:
                         >
                         </rdf:RDF>"""
 
+    extra_types = ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),)
+
     @pytest.mark.parametrize(
         "body,content_types,http_origin,no_sniff,extra_types,supported_types,expected",
         [
@@ -70,8 +72,8 @@ class TestMain:
             (b"", (b"text/html; charset=utf-8",), True, False, None, None, b"text/html"),
             (b"", (b"text/htmlpdfthing",), True, False, None, None, b"text/htmlpdfthing"),
             (b"", None, True, False, None, None, b"text/plain"),
-            (b"test", None, True, False, ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),), None, b"text/test"),
-            (b"TEST", None, True, False, ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),), None, b"text/plain"),
+            (b"test", None, True, False, extra_types, None, b"text/test",),
+            (b"TEST", None, True, False, extra_types, None, b"text/plain",),
         ],
     )
     def test_extract_mime(
