@@ -73,7 +73,6 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[
 
     while index < input_size:
         while True:
-            print(input_bytes[index : index + 1])
             if not input_bytes[index : index + 1]:
                 return supplied_type
 
