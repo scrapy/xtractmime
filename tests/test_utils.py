@@ -5,7 +5,6 @@ from xtractmime._utils import is_match_mime_pattern
 from xtractmime._patterns import WHITESPACE_BYTES
 
 from xtractmime._utils import (
-    contains_binary,
     get_archive_mime,
     get_audio_video_mime,
     get_extra_mime,
@@ -241,7 +240,3 @@ class TestUtils:
     def test_archive(self):
         assert get_archive_mime(self.body_zip) == b"application/zip"
         assert get_archive_mime(bytes.fromhex("00000000")) is None
-
-    def test_contains_binary(self):
-        assert contains_binary(bytes.fromhex("0001"))
-        assert not contains_binary(bytes.fromhex("090a"))

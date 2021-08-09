@@ -4,7 +4,6 @@ from typing import Optional, Set, Tuple
 from xtractmime._patterns import (
     ARCHIVE_PATTERNS,
     AUDIO_VIDEO_PATTERNS,
-    BINARY_BYTES,
     EXTRA_PATTERNS,
     FONT_PATTERNS,
     IMAGE_PATTERNS,
@@ -324,11 +323,3 @@ def get_extra_mime(
                 return pattern[3]
 
     return None
-
-
-def contains_binary(input_bytes: bytes) -> bool:
-    for i in input_bytes:
-        if bytes([i]) in BINARY_BYTES:
-            return True
-
-    return False

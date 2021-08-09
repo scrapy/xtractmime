@@ -1,8 +1,7 @@
 __version__ = "0.0.0"
 from typing import Optional, Set, Tuple
-from xtractmime._patterns import _APACHE_TYPES, WHITESPACE_BYTES
+from xtractmime._patterns import _APACHE_TYPES, BINARY_BYTES, WHITESPACE_BYTES
 from xtractmime._utils import (
-    contains_binary,
     get_archive_mime,
     get_audio_video_mime,
     get_extra_mime,
@@ -12,6 +11,14 @@ from xtractmime._utils import (
 from xtractmime.mimegroups import is_audio_video_mime_type, is_html_mime_type, is_image_mime_type
 
 RESOURCE_HEADER_BUFFER_LENGTH = 1445
+
+
+def is_binary_data(input_bytes: bytes) -> bool:
+    for i in input_bytes:
+        if bytes([i]) in BINARY_BYTES:
+            return True
+
+    return False
 
 
 def _find_unknown_mimetype(
@@ -40,7 +47,7 @@ def _find_unknown_mimetype(
     if matched_type:
         return matched_type
 
-    if not contains_binary(input_bytes):
+    if not is_binary_data(input_bytes):
         return b"text/plain"
 
     return b"application/octet-stream"
@@ -53,7 +60,7 @@ def _sniff_mislabled_binary(input_bytes: bytes) -> Optional[bytes]:
     ] == bytes.fromhex("efbbbf"):
         return b"text/plain"
 
-    if not contains_binary(input_bytes):
+    if not is_binary_data(input_bytes):
         return b"text/plain"
 
     return b"application/octet-stream"

@@ -5,6 +5,7 @@ from xtractmime import (
     _sniff_mislabled_binary,
     _sniff_mislabled_feed,
     extract_mime,
+    is_binary_data,
 )
 
 
@@ -54,24 +55,30 @@ class TestMain:
                         >
                         </rdf:RDF>"""
 
+    extra_types = ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),)
+
     @pytest.mark.parametrize(
-        "body,content_types,http_origin,no_sniff,supported_types,expected",
+        "body,content_types,http_origin,no_sniff,extra_types,supported_types,expected",
         [
-            ("foo.pdf", None, True, False, None, b"application/pdf"),
-            ("foo.gif", (b"image/gif",), True, True, None, b"image/gif"),
-            ("foo.txt", (b"text/plain",), True, False, None, b"text/plain"),
-            ("foo.xml", (b"text/xml",), True, False, None, b"text/xml"),
-            ("foo.html", (b"text/html",), True, False, None, b"text/html"),
-            ("foo.gif", (b"image/gif",), True, False, (b"image/gif",), b"image/gif"),
-            ("foo.mp4", (b"video/mp4",), True, False, (b"video/mp4",), b"video/mp4"),
-            (b"\x00\x00\x00\x00", (b"text/test",), True, False, None, b"text/test"),
-            (b"", (b"text/html; charset=utf-8",), True, False, None, b"text/html"),
-            (b"", (b"text/htmlpdfthing",), True, False, None, b"text/htmlpdfthing"),
-            (b"", None, True, False, None, b"text/plain"),
+            ("foo.pdf", None, True, False, None, None, b"application/pdf"),
+            ("foo.gif", (b"image/gif",), True, True, None, None, b"image/gif"),
+            ("foo.txt", (b"text/plain",), True, False, None, None, b"text/plain"),
+            ("foo.xml", (b"text/xml",), True, False, None, None, b"text/xml"),
+            ("foo.html", (b"text/html",), True, False, None, None, b"text/html"),
+            ("foo.gif", (b"image/gif",), True, False, None, (b"image/gif",), b"image/gif"),
+            ("foo.mp4", (b"video/mp4",), True, False, None, (b"video/mp4",), b"video/mp4"),
+            (b"GIF87a", (b"image/gif",), True, False, None, (b"image/x-icon",), b"image/gif"),
+            (b"ID3", (b"audio/mpeg",), True, False, None, (b"audio/basic",), b"audio/mpeg"),
+            (b"\x00\x00\x00\x00", (b"text/test",), True, False, None, None, b"text/test"),
+            (b"", (b"text/html; charset=utf-8",), True, False, None, None, b"text/html"),
+            (b"", (b"text/htmlpdfthing",), True, False, None, None, b"text/htmlpdfthing"),
+            (b"", None, True, False, None, None, b"text/plain"),
+            (b"test", None, True, False, extra_types, None, b"text/test",),
+            (b"TEST", None, True, False, extra_types, None, b"text/plain",),
         ],
     )
     def test_extract_mime(
-        self, body, content_types, http_origin, no_sniff, supported_types, expected
+        self, body, content_types, http_origin, no_sniff, extra_types, supported_types, expected
     ):
         if isinstance(body, str):
             with open(f"tests/files/{body}", "rb") as input_file:
@@ -82,6 +89,7 @@ class TestMain:
                 content_types=content_types,
                 http_origin=http_origin,
                 no_sniff=no_sniff,
+                extra_types=extra_types,
                 supported_types=supported_types,
             )
             == expected
@@ -145,3 +153,7 @@ class TestMain:
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
         assert _sniff_mislabled_feed(input_bytes, supplied_type) == expected
+
+    def test_is_binary_data(self):
+        assert is_binary_data(b"\x00\x01")
+        assert not is_binary_data(b"\x09\x0a")
