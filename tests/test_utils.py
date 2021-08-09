@@ -41,11 +41,11 @@ class TestUtils:
     @pytest.mark.parametrize(
         "input_bytes,byte_pattern,pattern_mask,lstrip,expected",
         [
-            (input_bytes, b"GIF87a", b"\xff\xff\xff\xff\xff\xff", None, True),
-            (input_bytes, b"GIF87a", b"\xff\xff\xff\xff\xff", None, ValueError),
-            (b" \t\n\rGIF87a", b"GIF87a", b"\xff\xff\xff\xff\xff\xff", WHITESPACE_BYTES, True),
-            (b"GIF", b"GIF87a", b"\xff\xff\xff\xff\xff\xff", None, False),
-            (b"\xff\xff\xff\xff\xff\xff", b"GIF87a", b"\xff\xff\xff\xff\xff\xff", None, False),
+            (input_bytes, b"GIF87a", bytes.fromhex("ffffffffffff"), None, True),
+            (input_bytes, b"GIF87a", bytes.fromhex("ffffffffff"), None, ValueError),
+            (b" \t\n\rGIF87a", b"GIF87a", bytes.fromhex("ffffffffffff"), WHITESPACE_BYTES, True),
+            (b"GIF", b"GIF87a", bytes.fromhex("ffffffffffff"), None, False),
+            (bytes.fromhex("ffffffffffff"), b"GIF87a", bytes.fromhex("ffffffffffff"), None, False),
         ],
     )
     def test_is_match_mime_pattern(
@@ -74,12 +74,12 @@ class TestUtils:
         "input_bytes,expected",
         [
             ("foo.mp4", True),
-            (b"\x00\x00\x00", False),
-            (b"\x00\x00\x00 ftypmp4", False),
-            (b"\x00\x00\x00 ftypmp42", False),
-            (b"\x00\x00\x00 testmp42\x00\x00\x00\x00mp42mp41isomavc1", False),
-            (b"\x00\x00\x00 ftyp2222\x00\x00\x00\x002222mp41isomavc1", True),
-            (b"\x00\x00\x00 ftyp2222\x00\x00\x00\x0022222221isomavc1", False),
+            (bytes.fromhex("000000"), False),
+            (bytes.fromhex("000000") + b" ftypmp4", False),
+            (bytes.fromhex("000000") + b" ftypmp42", False),
+            (bytes.fromhex("000000") + b" testmp42" + bytes.fromhex("00000000") + b"mp42mp41isomavc1", False),
+            (bytes.fromhex("000000") + b" ftyp2222" + bytes.fromhex("00000000") + b"2222mp41isomavc1", True),
+            (bytes.fromhex("000000") + b" ftyp2222" + bytes.fromhex("00000000") + b"22222221isomavc1", False),
         ],
     )
     def test_is_mp4_signature(self, input_bytes, expected):
@@ -92,10 +92,10 @@ class TestUtils:
         "input_bytes,expected",
         [
             ("foo.webm", True),
-            (b"\x00\x00\x00", False),
-            (b"\x1aF\xdf\xa3", False),
-            (b"\x1aE\xdf\xa3B\x82", False),
-            (b"\x1aE\xdf\xa3B\x82\x00\x00\x00", False),
+            (bytes.fromhex("000000"), False),
+            (bytes.fromhex("1a") + b"F" + bytes.fromhex("dfa3"), False),
+            (bytes.fromhex("1a") + b"E" + bytes.fromhex("dfa3") + b"B" + bytes.fromhex("82"), False),
+            (bytes.fromhex("1a") + b"E" + bytes.fromhex("dfa3") + b"B" + bytes.fromhex("82000000"), False),
         ],
     )
     def test_is_webm_signature(self, input_bytes, expected):
@@ -112,8 +112,8 @@ class TestUtils:
         "framesize,input_bytes,expected",
         [
             (417, "NonID3.mp3", True),
-            (417, b"\x00\x00\x00", False),
-            (417, b"\xff\xfb\x90d\x00", False),
+            (417, bytes.fromhex("000000"), False),
+            (417, bytes.fromhex("fffb90") + b"d" + bytes.fromhex("00"), False),
             (10, "NonID3.mp3", False),
         ],
     )
@@ -129,12 +129,12 @@ class TestUtils:
         "input_bytes,index,expected",
         [
             ("NonID3.mp3", 0, True),
-            (b"\x00\x00\x00", 0, False),
-            (b"\x00\x00\x00\x00", 0, False),
-            (b"\xff\xe0\x00\x00", 0, False),
-            (b"\xff\xe7\xf0\x00", 0, False),
-            (b"\xff\xe7\x0c\x00", 0, False),
-            (b"\xff\xe7\x00\x00", 0, False),
+            (bytes.fromhex("000000"), 0, False),
+            (bytes.fromhex("00000000"), 0, False),
+            (bytes.fromhex("ffe00000"), 0, False),
+            (bytes.fromhex("ffe7f000"), 0, False),
+            (bytes.fromhex("ffe70c00"), 0, False),
+            (bytes.fromhex("ffe70000"), 0, False),
         ],
     )
     def test_match_mp3_header(self, input_bytes, index, expected):
@@ -146,9 +146,9 @@ class TestUtils:
     @pytest.mark.parametrize(
         "input_bytes,expected",
         [
-            (b"\xff\xfb\x90d\x00", (3, 128000, 44100, 0)),
-            (b"\xff\x00\x90d\x00", (0, 80000, 11025, 0)),
-            (b"\xff\x10\x90d\x00", (2, 80000, 22050, 0)),
+            (bytes.fromhex("fffb90") + b"d" + bytes.fromhex("00"), (3, 128000, 44100, 0)),
+            (bytes.fromhex("ff0090") + b"d" + bytes.fromhex("00"), (0, 80000, 11025, 0)),
+            (bytes.fromhex("ff1090") + b"d" + bytes.fromhex("00"), (2, 80000, 22050, 0)),
         ],
     )
     def test_parse_mp3_frame(self, input_bytes, expected):
@@ -165,7 +165,7 @@ class TestUtils:
             ("foo.mp4", b"video/mp4"),
             ("foo.webm", b"video/webm"),
             ("NonID3.mp3", b"audio/mpeg"),
-            (b"\x00\x00\x00\x00", None),
+            (bytes.fromhex("00000000"), None),
         ],
     )
     def test_audio_video(self, input_bytes, expected):
@@ -179,7 +179,7 @@ class TestUtils:
         [
             ("foo.html", b"text/html"),
             ("foo.pdf", b"application/pdf"),
-            (b"\x00\x00\x00\x00", None),
+            (bytes.fromhex("00000000"), None),
         ],
     )
     def test_text(self, input_bytes, expected):
@@ -192,8 +192,8 @@ class TestUtils:
         "input_bytes,extra_types,expected",
         [
             ("foo.ps", None, b"application/postscript"),
-            (b"test", ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),), b"text/test"),
-            (b"\x00\x00\x00\x00", None, None),
+            (b"test", ((b"test", bytes.fromhex("ffffffff"), None, b"text/test"),), b"text/test"),
+            (bytes.fromhex("00000000"), None, None),
         ],
     )
     def test_extra(self, input_bytes, extra_types, expected):
@@ -204,16 +204,16 @@ class TestUtils:
 
     def test_image(self):
         assert get_image_mime(self.body_gif) == b"image/gif"
-        assert get_image_mime(b"\x00\x00\x00\x00") is None
+        assert get_image_mime(bytes.fromhex("00000000")) is None
 
     def test_font(self):
         assert get_font_mime(self.body_ttf) == b"font/ttf"
-        assert get_font_mime(b"\x00\x00\x00\x00") is None
+        assert get_font_mime(bytes.fromhex("00000000")) is None
 
     def test_archive(self):
         assert get_archive_mime(self.body_zip) == b"application/zip"
-        assert get_archive_mime(b"\x00\x00\x00\x00") is None
+        assert get_archive_mime(bytes.fromhex("00000000")) is None
 
     def test_contains_binary(self):
-        assert contains_binary(b"\x00\x01")
-        assert not contains_binary(b"\x09\x0a")
+        assert contains_binary(bytes.fromhex("0001"))
+        assert not contains_binary(bytes.fromhex("090a"))

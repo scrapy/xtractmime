@@ -136,14 +136,14 @@ def is_webm_signature(input_bytes: bytes) -> bool:
     if input_size < 4:
         return False
 
-    if input_bytes[:4] != b"\x1aE\xdf\xa3":
+    if input_bytes[:4] != bytes.fromhex("1a") + b"E" + bytes.fromhex("dfa3"):
         return False
 
     index = 4
 
     limit = min(input_size, 38)
     while index < limit:
-        if input_bytes[index : index + 2] == b"B\x82":
+        if input_bytes[index : index + 2] == b"B" + bytes.fromhex("82"):
             index += 2
 
             if index >= input_size:
@@ -167,8 +167,8 @@ def match_mp3_header(input_bytes: bytes, input_size: int, index: int) -> bool:
         return False
 
     if (
-        input_bytes[index : index + 1] != b"\xff"
-        or bytes([input_bytes[index + 1] & 224]) != b"\xe0"
+        input_bytes[index : index + 1] != bytes.fromhex("ff")
+        or bytes([input_bytes[index + 1] & 224]) != bytes.fromhex("e0")
     ):
         return False
 
