@@ -166,10 +166,9 @@ def match_mp3_header(input_bytes: bytes, input_size: int, index: int) -> bool:
     if input_size < 4:
         return False
 
-    if (
-        input_bytes[index : index + 1] != bytes.fromhex("ff")
-        or bytes([input_bytes[index + 1] & 224]) != bytes.fromhex("e0")
-    ):
+    if input_bytes[index : index + 1] != bytes.fromhex("ff") or bytes(
+        [input_bytes[index + 1] & 224]
+    ) != bytes.fromhex("e0"):
         return False
 
     layer = (input_bytes[index + 1] & 6) >> 1

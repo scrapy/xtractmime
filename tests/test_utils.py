@@ -77,9 +77,27 @@ class TestUtils:
             (bytes.fromhex("000000"), False),
             (bytes.fromhex("000000") + b" ftypmp4", False),
             (bytes.fromhex("000000") + b" ftypmp42", False),
-            (bytes.fromhex("000000") + b" testmp42" + bytes.fromhex("00000000") + b"mp42mp41isomavc1", False),
-            (bytes.fromhex("000000") + b" ftyp2222" + bytes.fromhex("00000000") + b"2222mp41isomavc1", True),
-            (bytes.fromhex("000000") + b" ftyp2222" + bytes.fromhex("00000000") + b"22222221isomavc1", False),
+            (
+                bytes.fromhex("000000")
+                + b" testmp42"
+                + bytes.fromhex("00000000")
+                + b"mp42mp41isomavc1",
+                False,
+            ),
+            (
+                bytes.fromhex("000000")
+                + b" ftyp2222"
+                + bytes.fromhex("00000000")
+                + b"2222mp41isomavc1",
+                True,
+            ),
+            (
+                bytes.fromhex("000000")
+                + b" ftyp2222"
+                + bytes.fromhex("00000000")
+                + b"22222221isomavc1",
+                False,
+            ),
         ],
     )
     def test_is_mp4_signature(self, input_bytes, expected):
@@ -94,8 +112,18 @@ class TestUtils:
             ("foo.webm", True),
             (bytes.fromhex("000000"), False),
             (bytes.fromhex("1a") + b"F" + bytes.fromhex("dfa3"), False),
-            (bytes.fromhex("1a") + b"E" + bytes.fromhex("dfa3") + b"B" + bytes.fromhex("82"), False),
-            (bytes.fromhex("1a") + b"E" + bytes.fromhex("dfa3") + b"B" + bytes.fromhex("82000000"), False),
+            (
+                bytes.fromhex("1a") + b"E" + bytes.fromhex("dfa3") + b"B" + bytes.fromhex("82"),
+                False,
+            ),
+            (
+                bytes.fromhex("1a")
+                + b"E"
+                + bytes.fromhex("dfa3")
+                + b"B"
+                + bytes.fromhex("82000000"),
+                False,
+            ),
         ],
     )
     def test_is_webm_signature(self, input_bytes, expected):
