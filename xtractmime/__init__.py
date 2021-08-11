@@ -55,9 +55,9 @@ def _find_unknown_mimetype(
 
 def _sniff_mislabled_binary(input_bytes: bytes) -> Optional[bytes]:
 
-    if input_bytes[:2] in (bytes.fromhex("feff"), bytes.fromhex("fffe")) or input_bytes[
+    if input_bytes[:2] in (bytes.fromhex("fe ff"), bytes.fromhex("ff fe")) or input_bytes[
         :3
-    ] == bytes.fromhex("efbbbf"):
+    ] == bytes.fromhex("ef bb bf"):
         return b"text/plain"
 
     if not is_binary_data(input_bytes):
@@ -70,7 +70,7 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[
     input_size = len(input_bytes)
     index = 0
 
-    if input_bytes[:3] == bytes.fromhex("efbbbf"):
+    if input_bytes[:3] == bytes.fromhex("ef bb bf"):
         index += 3
 
     while index < input_size:

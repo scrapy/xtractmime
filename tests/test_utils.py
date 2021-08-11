@@ -36,6 +36,12 @@ class TestUtils:
     with open("tests/files/foo.gif", "rb") as fp:
         body_gif = fp.read()
 
+    def get_byte_seq(self, filename):
+        if not os.path.isfile(f"tests/files/{filename}"):
+            return bytes.fromhex(filename)
+        else:
+            return filename
+
     @pytest.mark.parametrize(
         "input_bytes,byte_pattern,pattern_mask,lstrip,expected",
         [
@@ -110,8 +116,7 @@ class TestUtils:
         ],
     )
     def test_is_webm_signature(self, input_bytes, expected):
-        if not os.path.isfile(f"tests/files/{input_bytes}"):
-            input_bytes = bytes.fromhex(input_bytes)
+        input_bytes = self.get_byte_seq(input_bytes)
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
@@ -132,8 +137,7 @@ class TestUtils:
     )
     @mock.patch("xtractmime._utils.mp3_framesize")
     def test_is_mp3_non_ID3_signature(self, mock_framesize, framesize, input_bytes, expected):
-        if not os.path.isfile(f"tests/files/{input_bytes}"):
-            input_bytes = bytes.fromhex(input_bytes)
+        input_bytes = self.get_byte_seq(input_bytes)
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
@@ -153,8 +157,7 @@ class TestUtils:
         ],
     )
     def test_match_mp3_header(self, input_bytes, index, expected):
-        if not os.path.isfile(f"tests/files/{input_bytes}"):
-            input_bytes = bytes.fromhex(input_bytes)
+        input_bytes = self.get_byte_seq(input_bytes)
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
@@ -186,8 +189,7 @@ class TestUtils:
         ],
     )
     def test_audio_video(self, input_bytes, expected):
-        if not os.path.isfile(f"tests/files/{input_bytes}"):
-            input_bytes = bytes.fromhex(input_bytes)
+        input_bytes = self.get_byte_seq(input_bytes)
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
@@ -198,8 +200,7 @@ class TestUtils:
         [("foo.html", b"text/html"), ("foo.pdf", b"application/pdf"), ("00000000", None)],
     )
     def test_text(self, input_bytes, expected):
-        if not os.path.isfile(f"tests/files/{input_bytes}"):
-            input_bytes = bytes.fromhex(input_bytes)
+        input_bytes = self.get_byte_seq(input_bytes)
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()

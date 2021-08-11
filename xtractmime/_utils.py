@@ -135,14 +135,14 @@ def is_webm_signature(input_bytes: bytes) -> bool:
     if input_size < 4:
         return False
 
-    if input_bytes[:4] != bytes.fromhex("1a") + b"E" + bytes.fromhex("dfa3"):
+    if input_bytes[:4] != bytes.fromhex("1a 45 df a3"):
         return False
 
     index = 4
 
     limit = min(input_size, 38)
     while index < limit:
-        if input_bytes[index : index + 2] == b"B" + bytes.fromhex("82"):
+        if input_bytes[index : index + 2] == bytes.fromhex("42 82"):
             index += 2
 
             if index >= input_size:
