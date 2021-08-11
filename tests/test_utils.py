@@ -1,3 +1,4 @@
+import os
 import pytest
 
 from unittest import mock
@@ -35,21 +36,25 @@ class TestUtils:
     with open("tests/files/foo.gif", "rb") as fp:
         body_gif = fp.read()
 
-    input_bytes = b"GIF87a" + bytes.fromhex("401f7017f70000")
-
     @pytest.mark.parametrize(
         "input_bytes,byte_pattern,pattern_mask,lstrip,expected",
         [
-            (input_bytes, b"GIF87a", bytes.fromhex("ffffffffffff"), None, True),
-            (input_bytes, b"GIF87a", bytes.fromhex("ffffffffff"), None, ValueError),
-            (b" \t\n\rGIF87a", b"GIF87a", bytes.fromhex("ffffffffffff"), WHITESPACE_BYTES, True),
-            (b"GIF", b"GIF87a", bytes.fromhex("ffffffffffff"), None, False),
-            (bytes.fromhex("ffffffffffff"), b"GIF87a", bytes.fromhex("ffffffffffff"), None, False),
+            ((b"GIF87a", "401f7017f70000"), b"GIF87a", "ffffffffffff", None, True),
+            ((b"GIF87a", "401f7017f70000"), b"GIF87a", "ffffffffff", None, ValueError),
+            ((b" \t\n\rGIF87a",), b"GIF87a", "ffffffffffff", WHITESPACE_BYTES, True),
+            ((b"GIF",), b"GIF87a", "ffffffffffff", None, False),
+            (("ffffffffffff",), b"GIF87a", "ffffffffffff", None, False),
         ],
     )
     def test_is_match_mime_pattern(
         self, input_bytes, byte_pattern, pattern_mask, lstrip, expected
     ):
+        input_bytes = b"".join(
+            value if isinstance(value, bytes) else bytes.fromhex(value) for value in input_bytes
+        )
+        pattern_mask = (
+            pattern_mask if isinstance(pattern_mask, bytes) else bytes.fromhex(pattern_mask)
+        )
         if type(expected) == type and issubclass(expected, Exception):
             with pytest.raises(expected):
                 is_match_mime_pattern(
@@ -72,34 +77,23 @@ class TestUtils:
     @pytest.mark.parametrize(
         "input_bytes,expected",
         [
-            ("foo.mp4", True),
-            (bytes.fromhex("000000"), False),
-            (bytes.fromhex("000000") + b" ftypmp4", False),
-            (bytes.fromhex("000000") + b" ftypmp42", False),
-            (
-                bytes.fromhex("000000")
-                + b" testmp42"
-                + bytes.fromhex("00000000")
-                + b"mp42mp41isomavc1",
-                False,
-            ),
-            (
-                bytes.fromhex("000000")
-                + b" ftyp2222"
-                + bytes.fromhex("00000000")
-                + b"2222mp41isomavc1",
-                True,
-            ),
-            (
-                bytes.fromhex("000000")
-                + b" ftyp2222"
-                + bytes.fromhex("00000000")
-                + b"22222221isomavc1",
-                False,
-            ),
+            (("foo.mp4",), True),
+            (("000000",), False),
+            (("000000", b" ftypmp4"), False),
+            (("000000", b" ftypmp42"), False),
+            (("000000", b" testmp42", "00000000", b"mp42mp41isomavc1"), False),
+            (("000000", b" ftyp2222", "00000000", b"2222mp41isomavc1"), True),
+            (("000000", b" ftyp2222", "00000000", b"22222221isomavc1"), False),
         ],
     )
     def test_is_mp4_signature(self, input_bytes, expected):
+        if not os.path.isfile(f"tests/files/{input_bytes[0]}"):
+            input_bytes = b"".join(
+                value if isinstance(value, bytes) else bytes.fromhex(value)
+                for value in input_bytes
+            )
+        else:
+            input_bytes = input_bytes[0]
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
@@ -109,23 +103,15 @@ class TestUtils:
         "input_bytes,expected",
         [
             ("foo.webm", True),
-            (bytes.fromhex("000000"), False),
-            (bytes.fromhex("1a") + b"F" + bytes.fromhex("dfa3"), False),
-            (
-                bytes.fromhex("1a") + b"E" + bytes.fromhex("dfa3") + b"B" + bytes.fromhex("82"),
-                False,
-            ),
-            (
-                bytes.fromhex("1a")
-                + b"E"
-                + bytes.fromhex("dfa3")
-                + b"B"
-                + bytes.fromhex("82000000"),
-                False,
-            ),
+            ("000000", False),
+            ("1a 46 df a3", False),
+            ("1a 45 df a3 42 82", False),
+            ("1a 45 df a3 42 82 00 00 00", False),
         ],
     )
     def test_is_webm_signature(self, input_bytes, expected):
+        if not os.path.isfile(f"tests/files/{input_bytes}"):
+            input_bytes = bytes.fromhex(input_bytes)
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
@@ -139,13 +125,15 @@ class TestUtils:
         "framesize,input_bytes,expected",
         [
             (417, "NonID3.mp3", True),
-            (417, bytes.fromhex("000000"), False),
-            (417, bytes.fromhex("fffb90") + b"d" + bytes.fromhex("00"), False),
+            (417, "000000", False),
+            (417, "ff fb 90 64 00", False),
             (10, "NonID3.mp3", False),
         ],
     )
     @mock.patch("xtractmime._utils.mp3_framesize")
     def test_is_mp3_non_ID3_signature(self, mock_framesize, framesize, input_bytes, expected):
+        if not os.path.isfile(f"tests/files/{input_bytes}"):
+            input_bytes = bytes.fromhex(input_bytes)
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
@@ -156,15 +144,17 @@ class TestUtils:
         "input_bytes,index,expected",
         [
             ("NonID3.mp3", 0, True),
-            (bytes.fromhex("000000"), 0, False),
-            (bytes.fromhex("00000000"), 0, False),
-            (bytes.fromhex("ffe00000"), 0, False),
-            (bytes.fromhex("ffe7f000"), 0, False),
-            (bytes.fromhex("ffe70c00"), 0, False),
-            (bytes.fromhex("ffe70000"), 0, False),
+            ("000000", 0, False),
+            ("00000000", 0, False),
+            ("ff e0 00 00", 0, False),
+            ("ff e7 f0 00", 0, False),
+            ("ff e7 0c 00", 0, False),
+            ("ff e7 00 00", 0, False),
         ],
     )
     def test_match_mp3_header(self, input_bytes, index, expected):
+        if not os.path.isfile(f"tests/files/{input_bytes}"):
+            input_bytes = bytes.fromhex(input_bytes)
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
@@ -173,13 +163,13 @@ class TestUtils:
     @pytest.mark.parametrize(
         "input_bytes,expected",
         [
-            (bytes.fromhex("fffb90") + b"d" + bytes.fromhex("00"), (3, 128000, 44100, 0)),
-            (bytes.fromhex("ff0090") + b"d" + bytes.fromhex("00"), (0, 80000, 11025, 0)),
-            (bytes.fromhex("ff1090") + b"d" + bytes.fromhex("00"), (2, 80000, 22050, 0)),
+            ("ff fb 90 64 00", (3, 128000, 44100, 0)),
+            ("ff 00 90 64 00", (0, 80000, 11025, 0)),
+            ("ff 10 90 64 00", (2, 80000, 22050, 0)),
         ],
     )
     def test_parse_mp3_frame(self, input_bytes, expected):
-        assert parse_mp3_frame(input_bytes) == expected
+        assert parse_mp3_frame(bytes.fromhex(input_bytes)) == expected
 
     def test_mp3_framesize(self):
         assert mp3_framesize(1, 0, 44100, 1) == 1
@@ -192,10 +182,12 @@ class TestUtils:
             ("foo.mp4", b"video/mp4"),
             ("foo.webm", b"video/webm"),
             ("NonID3.mp3", b"audio/mpeg"),
-            (bytes.fromhex("00000000"), None),
+            ("00000000", None),
         ],
     )
     def test_audio_video(self, input_bytes, expected):
+        if not os.path.isfile(f"tests/files/{input_bytes}"):
+            input_bytes = bytes.fromhex(input_bytes)
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
@@ -203,13 +195,11 @@ class TestUtils:
 
     @pytest.mark.parametrize(
         "input_bytes,expected",
-        [
-            ("foo.html", b"text/html"),
-            ("foo.pdf", b"application/pdf"),
-            (bytes.fromhex("00000000"), None),
-        ],
+        [("foo.html", b"text/html"), ("foo.pdf", b"application/pdf"), ("00000000", None)],
     )
     def test_text(self, input_bytes, expected):
+        if not os.path.isfile(f"tests/files/{input_bytes}"):
+            input_bytes = bytes.fromhex(input_bytes)
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
@@ -220,10 +210,14 @@ class TestUtils:
         [
             ("foo.ps", None, b"application/postscript"),
             (b"test", ((b"test", bytes.fromhex("ffffffff"), None, b"text/test"),), b"text/test"),
-            (bytes.fromhex("00000000"), None, None),
+            ("00000000", None, None),
         ],
     )
     def test_extra(self, input_bytes, extra_types, expected):
+        if not os.path.isfile(f"tests/files/{input_bytes}"):
+            input_bytes = (
+                input_bytes if isinstance(input_bytes, bytes) else bytes.fromhex(input_bytes)
+            )
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
