@@ -36,11 +36,20 @@ class TestUtils:
     with open("tests/files/foo.gif", "rb") as fp:
         body_gif = fp.read()
 
-    def get_byte_seq(self, filename):
-        if not os.path.isfile(f"tests/files/{filename}"):
-            return bytes.fromhex(filename)
+    def get_byte_seq(self, seq):
+        if isinstance(seq, tuple):
+            if not os.path.isfile(f"tests/files/{seq[0]}"):
+                byte_seq = b"".join(
+                    value if isinstance(value, bytes) else bytes.fromhex(value) for value in seq
+                )
+            else:
+                byte_seq = seq[0]
+        elif not os.path.isfile(f"tests/files/{seq}"):
+            byte_seq = bytes.fromhex(seq)
         else:
-            return filename
+            byte_seq = seq
+
+        return byte_seq
 
     @pytest.mark.parametrize(
         "input_bytes,byte_pattern,pattern_mask,lstrip,expected",
@@ -55,12 +64,8 @@ class TestUtils:
     def test_is_match_mime_pattern(
         self, input_bytes, byte_pattern, pattern_mask, lstrip, expected
     ):
-        input_bytes = b"".join(
-            value if isinstance(value, bytes) else bytes.fromhex(value) for value in input_bytes
-        )
-        pattern_mask = (
-            pattern_mask if isinstance(pattern_mask, bytes) else bytes.fromhex(pattern_mask)
-        )
+        input_bytes = self.get_byte_seq(input_bytes)
+        pattern_mask = bytes.fromhex(pattern_mask)
         if type(expected) == type and issubclass(expected, Exception):
             with pytest.raises(expected):
                 is_match_mime_pattern(
@@ -93,13 +98,7 @@ class TestUtils:
         ],
     )
     def test_is_mp4_signature(self, input_bytes, expected):
-        if not os.path.isfile(f"tests/files/{input_bytes[0]}"):
-            input_bytes = b"".join(
-                value if isinstance(value, bytes) else bytes.fromhex(value)
-                for value in input_bytes
-            )
-        else:
-            input_bytes = input_bytes[0]
+        input_bytes = self.get_byte_seq(input_bytes)
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
