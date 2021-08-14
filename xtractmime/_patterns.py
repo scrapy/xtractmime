@@ -170,25 +170,25 @@ ARCHIVE_PATTERNS = (
 #: Section 7.1, step 1
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
 TEXT_PATTERNS = tuple(
-    (prefix + suffix, mask, WHITESPACE_BYTES, b"text/html")
+    (prefix + suffix, bytes.fromhex(mask), WHITESPACE_BYTES, b"text/html")
     for prefix, mask, in (
-        (b"<!DOCTYPE HTML", bytes.fromhex("ffffdfdfdfdfdfdfdfffdfdfdfdfff")),
-        (b"<HTML", bytes.fromhex("ffdfdfdfdfff")),
-        (b"<HEAD", bytes.fromhex("ffdfdfdfdfff")),
-        (b"<SCRIPT", bytes.fromhex("ffdfdfdfdfdfdfff")),
-        (b"<IFRAME", bytes.fromhex("ffdfdfdfdfdfdfff")),
-        (b"<H1", bytes.fromhex("ffdfffff")),
-        (b"<DIV", bytes.fromhex("ffdfdfdfff")),
-        (b"<FONT", bytes.fromhex("ffdfdfdfdfff")),
-        (b"<TABLE", bytes.fromhex("ffdfdfdfdfdfff")),
-        (b"<A", bytes.fromhex("ffdfff")),
-        (b"<STYLE", bytes.fromhex("ffdfdfdfdfdfff")),
-        (b"<TITLE", bytes.fromhex("ffdfdfdfdfdfff")),
-        (b"<B", bytes.fromhex("ffdfff")),
-        (b"<BODY", bytes.fromhex("ffdfdfdfdfff")),
-        (b"<BR", bytes.fromhex("ffdfdfff")),
-        (b"<P", bytes.fromhex("ffdfff")),
-        (b"<!--", bytes.fromhex("ffffffffff")),
+        (b"<!DOCTYPE HTML", "ffffdfdfdfdfdfdfdfffdfdfdfdfff"),
+        (b"<HTML", "ffdfdfdfdfff"),
+        (b"<HEAD", "ffdfdfdfdfff"),
+        (b"<SCRIPT", "ffdfdfdfdfdfdfff"),
+        (b"<IFRAME", "ffdfdfdfdfdfdfff"),
+        (b"<H1", "ffdfffff"),
+        (b"<DIV", "ffdfdfdfff"),
+        (b"<FONT", "ffdfdfdfdfff"),
+        (b"<TABLE", "ffdfdfdfdfdfff"),
+        (b"<A", "ffdfff"),
+        (b"<STYLE", "ffdfdfdfdfdfff"),
+        (b"<TITLE", "ffdfdfdfdfdfff"),
+        (b"<B", "ffdfff"),
+        (b"<BODY", "ffdfdfdfdfff"),
+        (b"<BR", "ffdfdfff"),
+        (b"<P", "ffdfff"),
+        (b"<!--", "ffffffffff"),
     )
     for suffix in (b" ", bytes.fromhex("3E"))
 ) + (
