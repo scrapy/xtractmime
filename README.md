@@ -25,7 +25,7 @@ b'text/html'
 ```
 
 Additional functionality to check if a MIME type belongs to a specific MIME type group using 
-methods mentioned in `xtractmime.mimegroups`:
+methods included in `xtractmime.mimegroups`:
 
 ```python
 >>> from xtractmime.mimegroups import is_html_mime_type, is_image_mime_type
@@ -40,15 +40,15 @@ False
 
 ## API Reference
 
-### function `xtractmime.extract_mime : Optional[bytes]`
+### function `xtractmime.extract_mime(*args, **kwargs) -> Optional[bytes]`
 **Parameters:**
 
 * `body: bytes`
-* `content_types: Optional[Tuple[bytes]], default = None`
-* `http_origin: bool, default = True`
-* `no_sniff: bool, default = False`
-* `extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]], default = None`
-* `supported_types: Set[bytes], default = None`
+* `content_types: Optional[Tuple[bytes]] = None`
+* `http_origin: bool = True`
+* `no_sniff: bool = False`
+* `extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]] = None`
+* `supported_types: Set[bytes] = None`
 
 Return the [MIME type essence](https://mimesniff.spec.whatwg.org/#mime-type-essence) (e.g. `text/html`) matching the input data, or 
 `None` if no match can be found.
@@ -64,9 +64,6 @@ bytes of the `body` and the specific number of bytes read is defined in the `xtr
 perform sniffing on the resource and *`False`* (by default) otherwise. Users may want to set
 this parameter to *`True`* if the [`X-Content-Type-Options`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options) response header is set to `nosniff`. For more info, see [here](https://mimesniff.spec.whatwg.org/#no-sniff-flag).
 
-Optional `supported_types` is a set of all [MIME types supported the by user agent](https://mimesniff.spec.whatwg.org/#supported-by-the-user-agent). If `supported_types` is not
-specified, all MIME types are assumed to be supported. Using this parameter can improve the performance of `xtractmime`.
-
 `extra_types` is a tuple of patterns to support detecting additional MIME types. Each entry in the tuple should follow the format
 **(Byte Pattern, Pattern Mask, Leading Bytes, MIME type)**:
 
@@ -77,7 +74,7 @@ specified, all MIME types are assumed to be supported. Using this parameter can 
 
 **Sample `extra_types`:**
 ```python
-extra_types = ((b'test', b'\xff\xff\xff\xff', None, b'text/test'),...)
+extra_types = ((b'test', b'\xff\xff\xff\xff', None, b'text/test'), ...)
 ```
 
 ---
@@ -86,6 +83,9 @@ extra_types = ((b'test', b'\xff\xff\xff\xff', None, b'text/test'),...)
 *Be careful while using the `extra_types` argument, as it may introduce some privilege escalation vulnerabilities for `xtractmime`. For more info, see [here](https://mimesniff.spec.whatwg.org/#ref-for-mime-type%E2%91%A1%E2%91%A8).*
 
 ---
+
+Optional `supported_types` is a set of all [MIME types supported the by user agent](https://mimesniff.spec.whatwg.org/#supported-by-the-user-agent). If `supported_types` is not
+specified, all MIME types are assumed to be supported. Using this parameter can improve the performance of `xtractmime`.
 
 ### function `xtractmime.is_binary_data(input_bytes: bytes) -> bool`
 
@@ -97,16 +97,16 @@ The following functions return `True` if a given MIME type belongs to a certain
 [MIME type group](https://mimesniff.spec.whatwg.org/#mime-type-groups), or 
 `False` otherwise:
 ```
-xtractmime.mimegroups.is_image_mime_type(mime_type: bytes) -> bool
+xtractmime.mimegroups.is_archive_mime_type(mime_type: bytes) -> bool
 xtractmime.mimegroups.is_audio_video_mime_type(mime_type: bytes) -> bool
 xtractmime.mimegroups.is_font_mime_type(mime_type: bytes) -> bool
-xtractmime.mimegroups.is_zip_mime_type(mime_type: bytes) -> bool
-xtractmime.mimegroups.is_archive_mime_type(mime_type: bytes) -> bool
-xtractmime.mimegroups.is_xml_mime_type(mime_type: bytes) -> bool
 xtractmime.mimegroups.is_html_mime_type(mime_type: bytes) -> bool
-xtractmime.mimegroups.is_scriptable_mime_type(mime_type: bytes) -> bool
+xtractmime.mimegroups.is_image_mime_type(mime_type: bytes) -> bool
 xtractmime.mimegroups.is_javascript_mime_type(mime_type: bytes) -> bool
 xtractmime.mimegroups.is_json_mime_type(mime_type: bytes) -> bool
+xtractmime.mimegroups.is_scriptable_mime_type(mime_type: bytes) -> bool
+xtractmime.mimegroups.is_xml_mime_type(mime_type: bytes) -> bool
+xtractmime.mimegroups.is_zip_mime_type(mime_type: bytes) -> bool
 ```
 **Example**
 ```python
