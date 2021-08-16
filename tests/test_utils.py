@@ -38,16 +38,16 @@ class TestUtils:
 
     def get_byte_seq(self, seq):
         if isinstance(seq, tuple):
-            if not os.path.isfile(f"tests/files/{seq[0]}"):
-                byte_seq = b"".join(
-                    value if isinstance(value, bytes) else bytes.fromhex(value) for value in seq
-                )
-            else:
-                byte_seq = seq[0]
-        elif not os.path.isfile(f"tests/files/{seq}"):
-            byte_seq = bytes.fromhex(seq)
-        else:
+            byte_seq = b"".join(
+                value if isinstance(value, bytes) else bytes.fromhex(value) for value in seq
+            )
+        elif isinstance(seq, bytes):
             byte_seq = seq
+        elif os.path.isfile(f"tests/files/{seq}"):
+            with open(f"tests/files/{seq}", "rb") as input_file:
+                byte_seq = input_file.read()
+        else:
+            byte_seq = bytes.fromhex(seq)
 
         return byte_seq
 
@@ -88,8 +88,8 @@ class TestUtils:
     @pytest.mark.parametrize(
         "input_bytes,expected",
         [
-            (("foo.mp4",), True),
-            (("000000",), False),
+            ("foo.mp4", True),
+            ("000000", False),
             (("000000", b" ftypmp4"), False),
             (("000000", b" ftypmp42"), False),
             (("000000", b" testmp42", "00000000", b"mp42mp41isomavc1"), False),
@@ -99,9 +99,6 @@ class TestUtils:
     )
     def test_is_mp4_signature(self, input_bytes, expected):
         input_bytes = self.get_byte_seq(input_bytes)
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
         assert is_mp4_signature(input_bytes) == expected
 
     @pytest.mark.parametrize(
@@ -116,9 +113,6 @@ class TestUtils:
     )
     def test_is_webm_signature(self, input_bytes, expected):
         input_bytes = self.get_byte_seq(input_bytes)
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
         assert is_webm_signature(input_bytes) == expected
 
     def test_parse_vint_number_size(self):
@@ -137,9 +131,6 @@ class TestUtils:
     @mock.patch("xtractmime._utils.mp3_framesize")
     def test_is_mp3_non_ID3_signature(self, mock_framesize, framesize, input_bytes, expected):
         input_bytes = self.get_byte_seq(input_bytes)
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
         mock_framesize.return_value = framesize
         assert is_mp3_non_ID3_signature(input_bytes) == expected
 
@@ -157,9 +148,6 @@ class TestUtils:
     )
     def test_match_mp3_header(self, input_bytes, index, expected):
         input_bytes = self.get_byte_seq(input_bytes)
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
         assert match_mp3_header(input_bytes, len(input_bytes), index) == expected
 
     @pytest.mark.parametrize(
@@ -189,9 +177,6 @@ class TestUtils:
     )
     def test_audio_video(self, input_bytes, expected):
         input_bytes = self.get_byte_seq(input_bytes)
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
         assert get_audio_video_mime(input_bytes) == expected
 
     @pytest.mark.parametrize(
@@ -200,9 +185,6 @@ class TestUtils:
     )
     def test_text(self, input_bytes, expected):
         input_bytes = self.get_byte_seq(input_bytes)
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
         assert get_text_mime(input_bytes) == expected
 
     @pytest.mark.parametrize(
@@ -214,13 +196,7 @@ class TestUtils:
         ],
     )
     def test_extra(self, input_bytes, extra_types, expected):
-        if not os.path.isfile(f"tests/files/{input_bytes}"):
-            input_bytes = (
-                input_bytes if isinstance(input_bytes, bytes) else bytes.fromhex(input_bytes)
-            )
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
+        input_bytes = self.get_byte_seq(input_bytes)
         assert get_extra_mime(input_bytes, extra_types) == expected
 
     def test_image(self):
