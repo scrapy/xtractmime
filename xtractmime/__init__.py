@@ -192,7 +192,7 @@ def extract_mime(
     http_origin: bool = True,
     no_sniff: bool = False,
     extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]] = None,
-    supported_types: Set[bytes] = None,
+    supported_types: Optional[Set[bytes]] = None,
 ) -> Optional[bytes]:
     extra_types = extra_types or tuple()
     supplied_type = content_types[-1] if content_types else b""
