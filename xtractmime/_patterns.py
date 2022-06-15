@@ -3,36 +3,39 @@ from typing import Optional, Set, Tuple
 
 #: Section 3
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#terminology  # noqa: E501
-BINARY_BYTES = (
-    b"\x00",
-    b"\x01",
-    b"\x02",
-    b"\x03",
-    b"\x04",
-    b"\x05",
-    b"\x06",
-    b"\x07",
-    b"\x08",
-    b"\x0b",
-    b"\x0e",
-    b"\x0f",
-    b"\x10",
-    b"\x11",
-    b"\x12",
-    b"\x13",
-    b"\x14",
-    b"\x15",
-    b"\x16",
-    b"\x17",
-    b"\x18",
-    b"\x19",
-    b"\x1a",
-    b"\x1c",
-    b"\x1d",
-    b"\x1e",
-    b"\x1f",
+BINARY_BYTES = tuple(
+    bytes.fromhex(byte)
+    for byte in (
+        "00",
+        "01",
+        "02",
+        "03",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08",
+        "0B",
+        "0E",
+        "0F",
+        "10",
+        "11",
+        "12",
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "1A",
+        "1C",
+        "1D",
+        "1E",
+        "1F",
+    )
 )
-WHITESPACE_BYTES = {b"\t", b"\r", b"\x0c", b"\n", b" "}
+WHITESPACE_BYTES = {b"\t", b"\r", bytes.fromhex("0c"), b"\n", b" "}
 
 #: Section 4.6
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#mime-type-groups  # noqa: E501
@@ -81,43 +84,48 @@ _APACHE_TYPES = [
 #: Section 6.1, step 1
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-image-type-pattern  # noqa: E501
 IMAGE_PATTERNS = (
-    (b"\x00\x00\x01\x00", b"\xff\xff\xff\xff", None, b"image/x-icon"),
-    (b"\x00\x00\x02\x00", b"\xff\xff\xff\xff", None, b"image/x-icon"),
-    (b"BM", b"\xff\xff", None, b"image/bmp"),
-    (b"GIF87a", b"\xff\xff\xff\xff\xff\xff", None, b"image/gif",),
-    (b"GIF89a", b"\xff\xff\xff\xff\xff\xff", None, b"image/gif",),
+    (bytes.fromhex("00000100"), bytes.fromhex("ffffffff"), None, b"image/x-icon"),
+    (bytes.fromhex("00000200"), bytes.fromhex("ffffffff"), None, b"image/x-icon"),
+    (b"BM", bytes.fromhex("ffff"), None, b"image/bmp"),
+    (b"GIF87a", bytes.fromhex("ffffffffffff"), None, b"image/gif",),
+    (b"GIF89a", bytes.fromhex("ffffffffffff"), None, b"image/gif",),
     (
-        b"RIFF\x00\x00\x00\x00WEBPVP",
-        b"\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff\xff\xff",
+        b"RIFF" + bytes.fromhex("00000000") + b"WEBPVP",
+        bytes.fromhex("ffffffff00000000ffffffffffff"),
         None,
         b"image/webp",
     ),
-    (b"\x89PNG\r\n\x1a\n", b"\xff\xff\xff\xff\xff\xff\xff\xff", None, b"image/png",),
-    (b"\xff\xd8\xff", b"\xff\xff\xff", None, b"image/jpeg",),
+    (
+        bytes.fromhex("89") + b"PNG\r\n" + bytes.fromhex("1a") + b"\n",
+        bytes.fromhex("ffffffffffffffff"),
+        None,
+        b"image/png",
+    ),
+    (bytes.fromhex("ffd8ff"), bytes.fromhex("ffffff"), None, b"image/jpeg",),
 )
 
 #: Section 6.2, step 1
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-audio-or-video-type-pattern  # noqa: E501
 AUDIO_VIDEO_PATTERNS = (
-    (b".snd", b"\xff\xff\xff\xff", None, b"audio/basic",),
+    (b".snd", bytes.fromhex("ffffffff"), None, b"audio/basic",),
     (
-        b"FORM\x00\x00\x00\x00AIFF",
-        b"\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff",
+        b"FORM" + bytes.fromhex("00000000") + b"AIFF",
+        bytes.fromhex("ffffffff00000000ffffffff"),
         None,
         b"audio/aiff",
     ),
-    (b"ID3", b"\xff\xff\xff", None, b"audio/mpeg",),
-    (b"OggS\x00", b"\xff\xff\xff\xff\xff", None, b"application/ogg",),
-    (b"MThd\x00\x00\x00\x06", b"\xff\xff\xff\xff\xff\xff\xff\xff", None, b"audio/midi",),
+    (b"ID3", bytes.fromhex("ffffff"), None, b"audio/mpeg",),
+    (b"OggS" + bytes.fromhex("00"), bytes.fromhex("ffffffffff"), None, b"application/ogg",),
+    (b"MThd" + bytes.fromhex("00000006"), bytes.fromhex("ffffffffffffffff"), None, b"audio/midi",),
     (
-        b"RIFF\x00\x00\x00\x00AVI ",
-        b"\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff",
+        b"RIFF" + bytes.fromhex("00000000") + b"AVI ",
+        bytes.fromhex("ffffffff00000000ffffffff"),
         None,
         b"video/avi",
     ),
     (
-        b"RIFF\x00\x00\x00\x00WAVE",
-        b"\xff\xff\xff\xff\x00\x00\x00\x00\xff\xff\xff\xff",
+        b"RIFF" + bytes.fromhex("00000000") + b"WAVE",
+        bytes.fromhex("ffffffff00000000ffffffff"),
         None,
         b"audio/wave",
     ),
@@ -128,70 +136,71 @@ AUDIO_VIDEO_PATTERNS = (
 FONT_PATTERNS = (
     (
         (
-            b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-            b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00LP"
+            bytes.fromhex("00000000000000000000000000000000000000000000000000000000000000000000")
+            + b"LP"
         ),
         (
-            b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00"
-            b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xff\xff"
+            bytes.fromhex(
+                "00000000000000000000000000000000000000000000000000000000000000000000ffff"
+            )
         ),
         None,
         b"application/vnd.ms-fontobject",
     ),
-    (b"\x00\x01\x00\x00", b"\xff\xff\xff\xff", None, b"font/ttf",),
-    (b"OTTO", b"\xff\xff\xff\xff", None, b"font/otf"),
-    (b"ttcf", b"\xff\xff\xff\xff", None, b"font/collection",),
-    (b"wOFF", b"\xff\xff\xff\xff", None, b"font/woff",),
-    (b"wOF2", b"\xff\xff\xff\xff", None, b"font/woff2",),
+    (bytes.fromhex("00010000"), bytes.fromhex("ffffffff"), None, b"font/ttf",),
+    (b"OTTO", bytes.fromhex("ffffffff"), None, b"font/otf"),
+    (b"ttcf", bytes.fromhex("ffffffff"), None, b"font/collection",),
+    (b"wOFF", bytes.fromhex("ffffffff"), None, b"font/woff",),
+    (b"wOF2", bytes.fromhex("ffffffff"), None, b"font/woff2",),
 )
 
 #: Section 6.4, step 1
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-archive-type-pattern  # noqa: E501
 ARCHIVE_PATTERNS = (
-    (b"\x1f\x8b\x08", b"\xff\xff\xff", None, b"application/x-gzip"),
-    (b"PK\x03\x04", b"\xff\xff\xff\xff", None, b"application/zip",),
-    (b"Rar \x1a\x07\x00", b"\xff\xff\xff\xff\xff\xff\xff", None, b"application/x-rar-compressed",),
+    (bytes.fromhex("1f8b08"), bytes.fromhex("ffffff"), None, b"application/x-gzip"),
+    (b"PK" + bytes.fromhex("0304"), bytes.fromhex("ffffffff"), None, b"application/zip",),
+    (
+        b"Rar " + bytes.fromhex("1a0700"),
+        bytes.fromhex("ffffffffffffff"),
+        None,
+        b"application/x-rar-compressed",
+    ),
 )
 
 #: Section 7.1, step 1
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
 TEXT_PATTERNS = tuple(
-    (prefix + suffix, mask, WHITESPACE_BYTES, b"text/html")
+    (prefix + suffix, bytes.fromhex(mask), WHITESPACE_BYTES, b"text/html")
     for prefix, mask, in (
-        (b"<!DOCTYPE HTML", b"\xff\xff\xdf\xdf\xdf\xdf\xdf\xdf\xdf\xff\xdf\xdf\xdf\xdf\xff"),
-        (b"<HTML", b"\xff\xdf\xdf\xdf\xdf\xff"),
-        (b"<HEAD", b"\xff\xdf\xdf\xdf\xdf\xff"),
-        (b"<SCRIPT", b"\xff\xdf\xdf\xdf\xdf\xdf\xdf\xff"),
-        (b"<IFRAME", b"\xff\xdf\xdf\xdf\xdf\xdf\xdf\xff"),
-        (b"<H1", b"\xff\xdf\xff\xff"),
-        (b"<DIV", b"\xff\xdf\xdf\xdf\xff"),
-        (b"<FONT", b"\xff\xdf\xdf\xdf\xdf\xff"),
-        (b"<TABLE", b"\xff\xdf\xdf\xdf\xdf\xdf\xff"),
-        (b"<A", b"\xff\xdf\xff"),
-        (b"<STYLE", b"\xff\xdf\xdf\xdf\xdf\xdf\xff"),
-        (b"<TITLE", b"\xff\xdf\xdf\xdf\xdf\xdf\xff"),
-        (b"<B", b"\xff\xdf\xff"),
-        (b"<BODY", b"\xff\xdf\xdf\xdf\xdf\xff"),
-        (b"<BR", b"\xff\xdf\xdf\xff"),
-        (b"<P", b"\xff\xdf\xff"),
-        (b"<!--", b"\xff\xff\xff\xff\xff"),
+        (b"<!DOCTYPE HTML", "ffffdfdfdfdfdfdfdfffdfdfdfdfff"),
+        (b"<HTML", "ffdfdfdfdfff"),
+        (b"<HEAD", "ffdfdfdfdfff"),
+        (b"<SCRIPT", "ffdfdfdfdfdfdfff"),
+        (b"<IFRAME", "ffdfdfdfdfdfdfff"),
+        (b"<H1", "ffdfffff"),
+        (b"<DIV", "ffdfdfdfff"),
+        (b"<FONT", "ffdfdfdfdfff"),
+        (b"<TABLE", "ffdfdfdfdfdfff"),
+        (b"<A", "ffdfff"),
+        (b"<STYLE", "ffdfdfdfdfdfff"),
+        (b"<TITLE", "ffdfdfdfdfdfff"),
+        (b"<B", "ffdfff"),
+        (b"<BODY", "ffdfdfdfdfff"),
+        (b"<BR", "ffdfdfff"),
+        (b"<P", "ffdfff"),
+        (b"<!--", "ffffffffff"),
     )
-    for suffix in (b"\x20", b"\x3E")
+    for suffix in (b" ", bytes.fromhex("3E"))
 ) + (
-    (b"<?xml", b"\xff\xff\xff\xff\xff", WHITESPACE_BYTES, b"text/xml"),
-    (b"%PDF-", b"\xff\xff\xff\xff\xff", None, b"application/pdf"),
+    (b"<?xml", bytes.fromhex("ffffffffff"), WHITESPACE_BYTES, b"text/xml"),
+    (b"%PDF-", bytes.fromhex("ffffffffff"), None, b"application/pdf"),
 )
 
 #: Section 7.1, step 2
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
 EXTRA_PATTERNS: Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...] = (
-    (
-        b"%!PS-Adobe-",
-        b"\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xff",
-        None,
-        b"application/postscript",
-    ),
-    (b"\xfe\xff\x00\x00", b"\xff\xff\x00\x00", None, b"text/plain"),
-    (b"\xff\xfe\x00\x00", b"\xff\xff\x00\x00", None, b"text/plain"),
-    (b"\xef\xbb\xbf\x00", b"\xff\xff\xff\x00", None, b"text/plain"),
+    (b"%!PS-Adobe-", bytes.fromhex("ffffffffffffffffffffff"), None, b"application/postscript",),
+    (bytes.fromhex("feff0000"), bytes.fromhex("ffff0000"), None, b"text/plain"),
+    (bytes.fromhex("fffe0000"), bytes.fromhex("ffff0000"), None, b"text/plain"),
+    (bytes.fromhex("efbbbf00"), bytes.fromhex("ffffff00"), None, b"text/plain"),
 )

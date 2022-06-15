@@ -1,3 +1,4 @@
+import os
 import pytest
 
 from unittest import mock
@@ -35,21 +36,36 @@ class TestUtils:
     with open("tests/files/foo.gif", "rb") as fp:
         body_gif = fp.read()
 
-    input_bytes = b"GIF87a" + bytes.fromhex("401f7017f70000")
+    def get_byte_seq(self, seq):
+        if isinstance(seq, tuple):
+            byte_seq = b"".join(
+                value if isinstance(value, bytes) else bytes.fromhex(value) for value in seq
+            )
+        elif isinstance(seq, bytes):
+            byte_seq = seq
+        elif os.path.isfile(f"tests/files/{seq}"):
+            with open(f"tests/files/{seq}", "rb") as input_file:
+                byte_seq = input_file.read()
+        else:
+            byte_seq = bytes.fromhex(seq)
+
+        return byte_seq
 
     @pytest.mark.parametrize(
         "input_bytes,byte_pattern,pattern_mask,lstrip,expected",
         [
-            (input_bytes, b"GIF87a", b"\xff\xff\xff\xff\xff\xff", None, True),
-            (input_bytes, b"GIF87a", b"\xff\xff\xff\xff\xff", None, ValueError),
-            (b" \t\n\rGIF87a", b"GIF87a", b"\xff\xff\xff\xff\xff\xff", WHITESPACE_BYTES, True),
-            (b"GIF", b"GIF87a", b"\xff\xff\xff\xff\xff\xff", None, False),
-            (b"\xff\xff\xff\xff\xff\xff", b"GIF87a", b"\xff\xff\xff\xff\xff\xff", None, False),
+            ((b"GIF87a", "401f7017f70000"), b"GIF87a", "ffffffffffff", None, True),
+            ((b"GIF87a", "401f7017f70000"), b"GIF87a", "ffffffffff", None, ValueError),
+            ((b" \t\n\rGIF87a",), b"GIF87a", "ffffffffffff", WHITESPACE_BYTES, True),
+            ((b"GIF",), b"GIF87a", "ffffffffffff", None, False),
+            (("ffffffffffff",), b"GIF87a", "ffffffffffff", None, False),
         ],
     )
     def test_is_match_mime_pattern(
         self, input_bytes, byte_pattern, pattern_mask, lstrip, expected
     ):
+        input_bytes = self.get_byte_seq(input_bytes)
+        pattern_mask = bytes.fromhex(pattern_mask)
         if type(expected) == type and issubclass(expected, Exception):
             with pytest.raises(expected):
                 is_match_mime_pattern(
@@ -73,34 +89,30 @@ class TestUtils:
         "input_bytes,expected",
         [
             ("foo.mp4", True),
-            (b"\x00\x00\x00", False),
-            (b"\x00\x00\x00 ftypmp4", False),
-            (b"\x00\x00\x00 ftypmp42", False),
-            (b"\x00\x00\x00 testmp42\x00\x00\x00\x00mp42mp41isomavc1", False),
-            (b"\x00\x00\x00 ftyp2222\x00\x00\x00\x002222mp41isomavc1", True),
-            (b"\x00\x00\x00 ftyp2222\x00\x00\x00\x0022222221isomavc1", False),
+            ("000000", False),
+            (("000000", b" ftypmp4"), False),
+            (("000000", b" ftypmp42"), False),
+            (("000000", b" testmp42", "00000000", b"mp42mp41isomavc1"), False),
+            (("000000", b" ftyp2222", "00000000", b"2222mp41isomavc1"), True),
+            (("000000", b" ftyp2222", "00000000", b"22222221isomavc1"), False),
         ],
     )
     def test_is_mp4_signature(self, input_bytes, expected):
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
+        input_bytes = self.get_byte_seq(input_bytes)
         assert is_mp4_signature(input_bytes) == expected
 
     @pytest.mark.parametrize(
         "input_bytes,expected",
         [
             ("foo.webm", True),
-            (b"\x00\x00\x00", False),
-            (b"\x1aF\xdf\xa3", False),
-            (b"\x1aE\xdf\xa3B\x82", False),
-            (b"\x1aE\xdf\xa3B\x82\x00\x00\x00", False),
+            ("000000", False),
+            ("1a 46 df a3", False),
+            ("1a 45 df a3 42 82", False),
+            ("1a 45 df a3 42 82 00 00 00", False),
         ],
     )
     def test_is_webm_signature(self, input_bytes, expected):
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
+        input_bytes = self.get_byte_seq(input_bytes)
         assert is_webm_signature(input_bytes) == expected
 
     def test_parse_vint_number_size(self):
@@ -111,16 +123,14 @@ class TestUtils:
         "framesize,input_bytes,expected",
         [
             (417, "NonID3.mp3", True),
-            (417, b"\x00\x00\x00", False),
-            (417, b"\xff\xfb\x90d\x00", False),
+            (417, "000000", False),
+            (417, "ff fb 90 64 00", False),
             (10, "NonID3.mp3", False),
         ],
     )
     @mock.patch("xtractmime._utils.mp3_framesize")
     def test_is_mp3_non_ID3_signature(self, mock_framesize, framesize, input_bytes, expected):
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
+        input_bytes = self.get_byte_seq(input_bytes)
         mock_framesize.return_value = framesize
         assert is_mp3_non_ID3_signature(input_bytes) == expected
 
@@ -128,30 +138,28 @@ class TestUtils:
         "input_bytes,index,expected",
         [
             ("NonID3.mp3", 0, True),
-            (b"\x00\x00\x00", 0, False),
-            (b"\x00\x00\x00\x00", 0, False),
-            (b"\xff\xe0\x00\x00", 0, False),
-            (b"\xff\xe7\xf0\x00", 0, False),
-            (b"\xff\xe7\x0c\x00", 0, False),
-            (b"\xff\xe7\x00\x00", 0, False),
+            ("000000", 0, False),
+            ("00000000", 0, False),
+            ("ff e0 00 00", 0, False),
+            ("ff e7 f0 00", 0, False),
+            ("ff e7 0c 00", 0, False),
+            ("ff e7 00 00", 0, False),
         ],
     )
     def test_match_mp3_header(self, input_bytes, index, expected):
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
+        input_bytes = self.get_byte_seq(input_bytes)
         assert match_mp3_header(input_bytes, len(input_bytes), index) == expected
 
     @pytest.mark.parametrize(
         "input_bytes,expected",
         [
-            (b"\xff\xfb\x90d\x00", (3, 128000, 44100, 0)),
-            (b"\xff\x00\x90d\x00", (0, 80000, 11025, 0)),
-            (b"\xff\x10\x90d\x00", (2, 80000, 22050, 0)),
+            ("ff fb 90 64 00", (3, 128000, 44100, 0)),
+            ("ff 00 90 64 00", (0, 80000, 11025, 0)),
+            ("ff 10 90 64 00", (2, 80000, 22050, 0)),
         ],
     )
     def test_parse_mp3_frame(self, input_bytes, expected):
-        assert parse_mp3_frame(input_bytes) == expected
+        assert parse_mp3_frame(bytes.fromhex(input_bytes)) == expected
 
     def test_mp3_framesize(self):
         assert mp3_framesize(1, 0, 44100, 1) == 1
@@ -164,51 +172,41 @@ class TestUtils:
             ("foo.mp4", b"video/mp4"),
             ("foo.webm", b"video/webm"),
             ("NonID3.mp3", b"audio/mpeg"),
-            (b"\x00\x00\x00\x00", None),
+            ("00000000", None),
         ],
     )
     def test_audio_video(self, input_bytes, expected):
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
+        input_bytes = self.get_byte_seq(input_bytes)
         assert get_audio_video_mime(input_bytes) == expected
 
     @pytest.mark.parametrize(
         "input_bytes,expected",
-        [
-            ("foo.html", b"text/html"),
-            ("foo.pdf", b"application/pdf"),
-            (b"\x00\x00\x00\x00", None),
-        ],
+        [("foo.html", b"text/html"), ("foo.pdf", b"application/pdf"), ("00000000", None)],
     )
     def test_text(self, input_bytes, expected):
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
+        input_bytes = self.get_byte_seq(input_bytes)
         assert get_text_mime(input_bytes) == expected
 
     @pytest.mark.parametrize(
         "input_bytes,extra_types,expected",
         [
             ("foo.ps", None, b"application/postscript"),
-            (b"test", ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),), b"text/test"),
-            (b"\x00\x00\x00\x00", None, None),
+            (b"test", ((b"test", bytes.fromhex("ffffffff"), None, b"text/test"),), b"text/test"),
+            ("00000000", None, None),
         ],
     )
     def test_extra(self, input_bytes, extra_types, expected):
-        if isinstance(input_bytes, str):
-            with open(f"tests/files/{input_bytes}", "rb") as input_file:
-                input_bytes = input_file.read()
+        input_bytes = self.get_byte_seq(input_bytes)
         assert get_extra_mime(input_bytes, extra_types) == expected
 
     def test_image(self):
         assert get_image_mime(self.body_gif) == b"image/gif"
-        assert get_image_mime(b"\x00\x00\x00\x00") is None
+        assert get_image_mime(bytes.fromhex("00000000")) is None
 
     def test_font(self):
         assert get_font_mime(self.body_ttf) == b"font/ttf"
-        assert get_font_mime(b"\x00\x00\x00\x00") is None
+        assert get_font_mime(bytes.fromhex("00000000")) is None
 
     def test_archive(self):
         assert get_archive_mime(self.body_zip) == b"application/zip"
-        assert get_archive_mime(b"\x00\x00\x00\x00") is None
+        assert get_archive_mime(bytes.fromhex("00000000")) is None
