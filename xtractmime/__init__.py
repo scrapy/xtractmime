@@ -1,4 +1,4 @@
-__version__ = "0.0.0"
+__version__ = "0.1.0"
 from typing import Optional, Set, Tuple
 from xtractmime._patterns import _APACHE_TYPES, BINARY_BYTES, WHITESPACE_BYTES
 from xtractmime._utils import (
