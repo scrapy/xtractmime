@@ -73,8 +73,24 @@ class TestMain:
             (b"", (b"text/html; charset=utf-8",), True, False, None, None, b"text/html"),
             (b"", (b"text/htmlpdfthing",), True, False, None, None, b"text/htmlpdfthing"),
             (b"", None, True, False, None, None, b"text/plain"),
-            (b"test", None, True, False, extra_types, None, b"text/test",),
-            (b"TEST", None, True, False, extra_types, None, b"text/plain",),
+            (
+                b"test",
+                None,
+                True,
+                False,
+                extra_types,
+                None,
+                b"text/test",
+            ),
+            (
+                b"TEST",
+                None,
+                True,
+                False,
+                extra_types,
+                None,
+                b"text/plain",
+            ),
         ],
     )
     def test_extract_mime(
