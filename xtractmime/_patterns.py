@@ -87,8 +87,18 @@ IMAGE_PATTERNS = (
     (bytes.fromhex("00000100"), bytes.fromhex("ffffffff"), None, b"image/x-icon"),
     (bytes.fromhex("00000200"), bytes.fromhex("ffffffff"), None, b"image/x-icon"),
     (b"BM", bytes.fromhex("ffff"), None, b"image/bmp"),
-    (b"GIF87a", bytes.fromhex("ffffffffffff"), None, b"image/gif",),
-    (b"GIF89a", bytes.fromhex("ffffffffffff"), None, b"image/gif",),
+    (
+        b"GIF87a",
+        bytes.fromhex("ffffffffffff"),
+        None,
+        b"image/gif",
+    ),
+    (
+        b"GIF89a",
+        bytes.fromhex("ffffffffffff"),
+        None,
+        b"image/gif",
+    ),
     (
         b"RIFF" + bytes.fromhex("00000000") + b"WEBPVP",
         bytes.fromhex("ffffffff00000000ffffffffffff"),
@@ -101,22 +111,47 @@ IMAGE_PATTERNS = (
         None,
         b"image/png",
     ),
-    (bytes.fromhex("ffd8ff"), bytes.fromhex("ffffff"), None, b"image/jpeg",),
+    (
+        bytes.fromhex("ffd8ff"),
+        bytes.fromhex("ffffff"),
+        None,
+        b"image/jpeg",
+    ),
 )
 
 #: Section 6.2, step 1
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-audio-or-video-type-pattern  # noqa: E501
 AUDIO_VIDEO_PATTERNS = (
-    (b".snd", bytes.fromhex("ffffffff"), None, b"audio/basic",),
+    (
+        b".snd",
+        bytes.fromhex("ffffffff"),
+        None,
+        b"audio/basic",
+    ),
     (
         b"FORM" + bytes.fromhex("00000000") + b"AIFF",
         bytes.fromhex("ffffffff00000000ffffffff"),
         None,
         b"audio/aiff",
     ),
-    (b"ID3", bytes.fromhex("ffffff"), None, b"audio/mpeg",),
-    (b"OggS" + bytes.fromhex("00"), bytes.fromhex("ffffffffff"), None, b"application/ogg",),
-    (b"MThd" + bytes.fromhex("00000006"), bytes.fromhex("ffffffffffffffff"), None, b"audio/midi",),
+    (
+        b"ID3",
+        bytes.fromhex("ffffff"),
+        None,
+        b"audio/mpeg",
+    ),
+    (
+        b"OggS" + bytes.fromhex("00"),
+        bytes.fromhex("ffffffffff"),
+        None,
+        b"application/ogg",
+    ),
+    (
+        b"MThd" + bytes.fromhex("00000006"),
+        bytes.fromhex("ffffffffffffffff"),
+        None,
+        b"audio/midi",
+    ),
     (
         b"RIFF" + bytes.fromhex("00000000") + b"AVI ",
         bytes.fromhex("ffffffff00000000ffffffff"),
@@ -147,18 +182,43 @@ FONT_PATTERNS = (
         None,
         b"application/vnd.ms-fontobject",
     ),
-    (bytes.fromhex("00010000"), bytes.fromhex("ffffffff"), None, b"font/ttf",),
+    (
+        bytes.fromhex("00010000"),
+        bytes.fromhex("ffffffff"),
+        None,
+        b"font/ttf",
+    ),
     (b"OTTO", bytes.fromhex("ffffffff"), None, b"font/otf"),
-    (b"ttcf", bytes.fromhex("ffffffff"), None, b"font/collection",),
-    (b"wOFF", bytes.fromhex("ffffffff"), None, b"font/woff",),
-    (b"wOF2", bytes.fromhex("ffffffff"), None, b"font/woff2",),
+    (
+        b"ttcf",
+        bytes.fromhex("ffffffff"),
+        None,
+        b"font/collection",
+    ),
+    (
+        b"wOFF",
+        bytes.fromhex("ffffffff"),
+        None,
+        b"font/woff",
+    ),
+    (
+        b"wOF2",
+        bytes.fromhex("ffffffff"),
+        None,
+        b"font/woff2",
+    ),
 )
 
 #: Section 6.4, step 1
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-archive-type-pattern  # noqa: E501
 ARCHIVE_PATTERNS = (
     (bytes.fromhex("1f8b08"), bytes.fromhex("ffffff"), None, b"application/x-gzip"),
-    (b"PK" + bytes.fromhex("0304"), bytes.fromhex("ffffffff"), None, b"application/zip",),
+    (
+        b"PK" + bytes.fromhex("0304"),
+        bytes.fromhex("ffffffff"),
+        None,
+        b"application/zip",
+    ),
     (
         b"Rar " + bytes.fromhex("1a0700"),
         bytes.fromhex("ffffffffffffff"),
@@ -199,7 +259,12 @@ TEXT_PATTERNS = tuple(
 #: Section 7.1, step 2
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
 EXTRA_PATTERNS: Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...] = (
-    (b"%!PS-Adobe-", bytes.fromhex("ffffffffffffffffffffff"), None, b"application/postscript",),
+    (
+        b"%!PS-Adobe-",
+        bytes.fromhex("ffffffffffffffffffffff"),
+        None,
+        b"application/postscript",
+    ),
     (bytes.fromhex("feff0000"), bytes.fromhex("ffff0000"), None, b"text/plain"),
     (bytes.fromhex("fffe0000"), bytes.fromhex("ffff0000"), None, b"text/plain"),
     (bytes.fromhex("efbbbf00"), bytes.fromhex("ffffff00"), None, b"text/plain"),
