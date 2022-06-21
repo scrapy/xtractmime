@@ -119,3 +119,8 @@ False
 >>> is_zip_mime_type(mime_type)
 False
 ```
+
+
+## Changelog
+
+See the [changelog](CHANGELOG.md)
