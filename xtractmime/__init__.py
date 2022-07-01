@@ -198,8 +198,8 @@ def extract_mime(
 ) -> Optional[bytes]:
     extra_types = extra_types or tuple()
     supplied_type = content_types[-1] if content_types else b""
-    supplied_type = supplied_type.split(b";")[0].strip().lower()
     check_for_apache = http_origin and supplied_type in _APACHE_TYPES
+    supplied_type = supplied_type.split(b";")[0].strip().lower()
     resource_header = memoryview(body)[:RESOURCE_HEADER_BUFFER_LENGTH]
 
     if supplied_type in (b"", b"unknown/unknown", b"application/unknown", b"*/*"):
