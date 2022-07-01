@@ -74,6 +74,15 @@ class TestMain:
             (b"", (b"text/htmlpdfthing",), True, False, None, None, b"text/htmlpdfthing"),
             (b"", None, True, False, None, None, b"text/plain"),
             (
+                b"\x00\x01\xff",
+                (b"text/plain; charset=windows-1252",),
+                True,
+                False,
+                None,
+                None,
+                b"text/plain",
+            ),
+            (
                 b"test",
                 None,
                 True,
