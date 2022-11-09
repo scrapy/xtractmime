@@ -4,7 +4,6 @@ import setuptools
 with open("README.md", "r", encoding="utf-8") as desc:
     long_description = desc.read()
 
-
 setuptools.setup(
     name="xtractmime",
     version="0.1.0",
@@ -28,6 +27,8 @@ setuptools.setup(
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Programming Language :: Python :: Implementation :: PyPy",
         "Framework :: Scrapy",
         "Intended Audience :: Developers",
         "Topic :: Internet :: WWW/HTTP",
