@@ -1,7 +1,7 @@
 # xtractmime
 
 `xtractmime` is a [BSD-licensed](https://opensource.org/licenses/BSD-3-Clause)
-Python 3.6+ implementation of the [MIME Sniffing
+Python 3.7+ implementation of the [MIME Sniffing
 Standard](https://mimesniff.spec.whatwg.org/).
 
 Install from [`PyPI`](https://pypi.python.org/pypi/xtractmime):
