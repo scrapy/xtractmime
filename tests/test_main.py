@@ -74,15 +74,6 @@ class TestMain:
             (b"", (b"text/htmlpdfthing",), True, False, None, None, b"text/htmlpdfthing"),
             (b"", None, True, False, None, None, b"text/plain"),
             (
-                b"\x00\x01\xff",
-                (b"text/plain; charset=windows-1252",),
-                True,
-                False,
-                None,
-                None,
-                b"text/plain",
-            ),
-            (
                 b"test",
                 None,
                 True,
@@ -99,6 +90,42 @@ class TestMain:
                 extra_types,
                 None,
                 b"text/plain",
+            ),
+            # Even if the body is binary, if the Content-Type says it is text,
+            # we interpret it as text, as long as the Content-Type is not one
+            # of the 4 affected by the Apache bug.
+            #
+            # https://mimesniff.spec.whatwg.org/#interpreting-the-resource-metadata
+            *(
+                (
+                    b"\x00\x01\xff",
+                    (supplied_content_type,),
+                    True,
+                    False,
+                    None,
+                    None,
+                    expected_content_type,
+                )
+                for (supplied_content_type, expected_content_type) in (
+                    (b"text/json", b"text/json"),
+                    *(
+                        (supplied_content_type, b"text/plain")
+                        for supplied_content_type in (
+                            b"text/plain; charset=Iso-8859-1",
+                            b"text/plain; charset=utf-8",
+                            b"text/plain; charset=windows-1252",
+                        )
+                    ),
+                    *(
+                        (supplied_content_type, b"application/octet-stream")
+                        for supplied_content_type in (
+                            b"text/plain",
+                            b"text/plain; charset=ISO-8859-1",
+                            b"text/plain; charset=iso-8859-1",
+                            b"text/plain; charset=UTF-8",
+                        )
+                    ),
+                )
             ),
         ],
     )
