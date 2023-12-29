@@ -128,10 +128,15 @@ class TestMain:
                 )
             ),
             # Malformed MIME type
-            (b"...", (b"javascript charset=UTF-8",), True, False, None, None, b"text/plain"),
-            (b"...", (b"a/b/c",), True, False, None, None, b"text/plain"),
-            (b"...", (b"a/[",), True, False, None, None, b"text/plain"),
-            (b"...", (b"[/a",), True, False, None, None, b"text/plain"),
+            *(
+                (b"...", (mime_type,), True, False, None, None, b"text/plain")
+                for mime_type in (
+                    b"javascript charset=UTF-8",
+                    b"a/b/c",
+                    b"a/[",
+                    b"[/a",
+                )
+            ),
         ],
     )
     def test_extract_mime(
