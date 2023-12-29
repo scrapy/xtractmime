@@ -129,6 +129,9 @@ class TestMain:
             ),
             # Malformed MIME type
             (b"...", (b"javascript charset=UTF-8",), True, False, None, None, b"text/plain"),
+            (b"...", (b"a/b/c",), True, False, None, None, b"text/plain"),
+            (b"...", (b"a/[",), True, False, None, None, b"text/plain"),
+            (b"...", (b"[/a",), True, False, None, None, b"text/plain"),
         ],
     )
     def test_extract_mime(

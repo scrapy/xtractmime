@@ -188,7 +188,7 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[
     return supplied_type
 
 
-_TOKEN = br"^\s*[-!#$%&'*+.0-9A-Z^_`a-z{|}~]+\s*$"
+_TOKEN = rb"^\s*[-!#$%&'*+.0-9A-Z^_`a-z{|}~]+\s*$"
 
 
 def _is_valid_mime_type(mime_type):
