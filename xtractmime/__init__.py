@@ -1,4 +1,4 @@
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 import re
 from typing import Optional, Set, Tuple
 from xtractmime._patterns import _APACHE_TYPES, BINARY_BYTES, WHITESPACE_BYTES
