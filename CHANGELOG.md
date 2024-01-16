@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.1 (unreleased)
+## 0.2.1 (2024-01-16)
 
 A specified content type is now ignored if it is not a valid MIME type.
 
