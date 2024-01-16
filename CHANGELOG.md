@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (unreleased)
+
+A specified content type is now ignored if it is not a valid MIME type.
+
 ## 0.2.0 (2023-08-31)
 
 Dropped Python 3.6 support, added official Python 3.10, 3.11 and PyPy support.
