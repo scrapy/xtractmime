@@ -46,5 +46,17 @@ include = [
     "/tox.ini",
 ]
 
-[tool.black]
-line-length = 99
+[tool.bumpversion]
+current_version = "0.2.1"
+commit = true
+tag = true
+tag_name = "v{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "xtractmime/__init__.py"
+
+[[tool.bumpversion.files]]
+filename = "CHANGELOG.md"
+search = "\\(unreleased\\)$"
+replace = "({now:%Y-%m-%d})"
+regex = true
