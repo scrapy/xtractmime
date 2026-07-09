@@ -1,2 +1,50 @@
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "xtractmime"
+dynamic = ["version"]
+description = "Implementation of the MIME Sniffing standard (https://mimesniff.spec.whatwg.org/)"
+readme = "README.md"
+license = "BSD-3-Clause"
+requires-python = ">=3.7"
+authors = [
+    { name = "Akshay Sharma", email = "akshaysharmajs@gmail.com" },
+]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Framework :: Scrapy",
+    "Intended Audience :: Developers",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://github.com/scrapy/xtractmime"
+Source = "https://github.com/scrapy/xtractmime"
+Tracker = "https://github.com/scrapy/xtractmime/issues"
+"Release notes" = "https://github.com/scrapy/xtractmime/blob/main/CHANGELOG.md"
+
+[tool.hatch.version]
+path = "xtractmime/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/tests",
+    "/xtractmime",
+    "/CHANGELOG.md",
+    "/tox.ini",
+]
+
 [tool.black]
 line-length = 99

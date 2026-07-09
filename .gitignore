@@ -7,3 +7,7 @@
 .coverage
 htmlcov/
 coverage.xml
+build/
+dist/
+.idea/
+.vscode/
