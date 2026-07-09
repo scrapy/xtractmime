@@ -24,7 +24,7 @@ b'text/plain'
 b'text/html'
 ```
 
-Additional functionality to check if a MIME type belongs to a specific MIME type group using 
+Additional functionality to check if a MIME type belongs to a specific MIME type group using
 methods included in `xtractmime.mimegroups`:
 
 ```python
@@ -50,7 +50,7 @@ False
 * `extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]] = None`
 * `supported_types: Set[bytes] = None`
 
-Return the [MIME type essence](https://mimesniff.spec.whatwg.org/#mime-type-essence) (e.g. `text/html`) matching the input data, or 
+Return the [MIME type essence](https://mimesniff.spec.whatwg.org/#mime-type-essence) (e.g. `text/html`) matching the input data, or
 `None` if no match can be found.
 
 The `body` parameter is the byte sequence of which MIME type is to be determined. `xtractmime` only considers the first few
@@ -90,11 +90,11 @@ specified, all MIME types are assumed to be supported. Using this parameter can 
 ### function `xtractmime.is_binary_data(input_bytes: bytes) -> bool`
 
 Return *`True`* if the provided byte sequence contains any binary data bytes, else *`False`*
- 
+
 ### MIME type group functions
 
-The following functions return `True` if a given MIME type belongs to a certain 
-[MIME type group](https://mimesniff.spec.whatwg.org/#mime-type-groups), or 
+The following functions return `True` if a given MIME type belongs to a certain
+[MIME type group](https://mimesniff.spec.whatwg.org/#mime-type-groups), or
 `False` otherwise:
 ```
 xtractmime.mimegroups.is_archive_mime_type(mime_type: bytes) -> bool

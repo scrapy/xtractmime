@@ -23,7 +23,6 @@ from xtractmime._utils import (
 
 
 class TestUtils:
-
     with open("tests/files/foo.webm", "rb") as fp:
         body_webm = fp.read()
 
@@ -39,7 +38,8 @@ class TestUtils:
     def get_byte_seq(self, seq):
         if isinstance(seq, tuple):
             byte_seq = b"".join(
-                value if isinstance(value, bytes) else bytes.fromhex(value) for value in seq
+                value if isinstance(value, bytes) else bytes.fromhex(value)
+                for value in seq
             )
         elif isinstance(seq, bytes):
             byte_seq = seq
@@ -66,7 +66,7 @@ class TestUtils:
     ):
         input_bytes = self.get_byte_seq(input_bytes)
         pattern_mask = bytes.fromhex(pattern_mask)
-        if type(expected) == type and issubclass(expected, Exception):
+        if type(expected) is type and issubclass(expected, Exception):
             with pytest.raises(expected):
                 is_match_mime_pattern(
                     input_bytes=input_bytes,
@@ -129,7 +129,9 @@ class TestUtils:
         ],
     )
     @mock.patch("xtractmime._utils.mp3_framesize")
-    def test_is_mp3_non_ID3_signature(self, mock_framesize, framesize, input_bytes, expected):
+    def test_is_mp3_non_ID3_signature(
+        self, mock_framesize, framesize, input_bytes, expected
+    ):
         input_bytes = self.get_byte_seq(input_bytes)
         mock_framesize.return_value = framesize
         assert is_mp3_non_ID3_signature(input_bytes) == expected
@@ -181,7 +183,11 @@ class TestUtils:
 
     @pytest.mark.parametrize(
         "input_bytes,expected",
-        [("foo.html", b"text/html"), ("foo.pdf", b"application/pdf"), ("00000000", None)],
+        [
+            ("foo.html", b"text/html"),
+            ("foo.pdf", b"application/pdf"),
+            ("00000000", None),
+        ],
     )
     def test_text(self, input_bytes, expected):
         input_bytes = self.get_byte_seq(input_bytes)
@@ -191,7 +197,11 @@ class TestUtils:
         "input_bytes,extra_types,expected",
         [
             ("foo.ps", None, b"application/postscript"),
-            (b"test", ((b"test", bytes.fromhex("ffffffff"), None, b"text/test"),), b"text/test"),
+            (
+                b"test",
+                ((b"test", bytes.fromhex("ffffffff"), None, b"text/test"),),
+                b"text/test",
+            ),
             ("00000000", None, None),
         ],
     )

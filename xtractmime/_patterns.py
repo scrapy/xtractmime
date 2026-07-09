@@ -171,7 +171,9 @@ AUDIO_VIDEO_PATTERNS = (
 FONT_PATTERNS = (
     (
         (
-            bytes.fromhex("00000000000000000000000000000000000000000000000000000000000000000000")
+            bytes.fromhex(
+                "00000000000000000000000000000000000000000000000000000000000000000000"
+            )
             + b"LP"
         ),
         (
@@ -231,7 +233,7 @@ ARCHIVE_PATTERNS = (
 #: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
 TEXT_PATTERNS = tuple(
     (prefix + suffix, bytes.fromhex(mask), WHITESPACE_BYTES, b"text/html")
-    for prefix, mask, in (
+    for prefix, mask in (
         (b"<!DOCTYPE HTML", "ffffdfdfdfdfdfdfdfffdfdfdfdfff"),
         (b"<HTML", "ffdfdfdfdfff"),
         (b"<HEAD", "ffdfdfdfdfff"),

@@ -1,25 +1,50 @@
-name: Publish
+name: publish
+
+permissions:
+  contents: read
+
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
 
 jobs:
-  publish:
+  build:
+    name: Build distribution
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Set up Python 3
-      uses: actions/setup-python@v2
+    - uses: actions/checkout@v7
       with:
-        python-version: 3
+        persist-credentials: false
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.14"
+    - name: Install pypa/build
+      run: python3 -m pip install build --user
+    - name: Build a binary wheel and a source tarball
+      run: python3 -m build
+    - name: Store the distribution packages
+      uses: actions/upload-artifact@v7
+      with:
+        name: python-package-distributions
+        path: dist/
 
-    - name: Publish to PyPI
-      run: |
-        pip install --upgrade pip
-        pip install --upgrade setuptools wheel twine
-        python setup.py sdist bdist_wheel
-        export TWINE_USERNAME=__token__
-        export TWINE_PASSWORD=${{ secrets.PYPI_TOKEN }}
-        twine upload dist/*
+  publish:
+    name: Publish to PyPI
+    needs:
+    - build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/xtractmime
+    permissions:
+      id-token: write
+    steps:
+    - name: Download all the dists
+      uses: actions/download-artifact@v8
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
