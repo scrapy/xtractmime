@@ -1,2 +1,0 @@
-pytest-cov>=2.8
-pytest>=5.4
