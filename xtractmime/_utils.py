@@ -51,7 +51,7 @@ def is_match_mime_pattern(
     input_bytes: bytes,
     byte_pattern: bytes,
     pattern_mask: bytes,
-    lstrip: Set[bytes] = None,
+    lstrip: Set[bytes] | None = None,
 ) -> bool:
     input_size = len(input_bytes)
     pattern_size = len(byte_pattern)
