@@ -49,7 +49,4 @@ def is_javascript_mime_type(mime_type: bytes) -> bool:
 
 
 def is_json_mime_type(mime_type: bytes) -> bool:
-    return mime_type.endswith(b"+json") or mime_type in (
-        b"application/json",
-        b"text/json",
-    )
+    return mime_type.endswith(b"+json") or mime_type in (b"application/json", b"text/json")

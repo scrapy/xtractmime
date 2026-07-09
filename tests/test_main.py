@@ -64,69 +64,13 @@ class TestMain:
             ("foo.txt", (b"text/plain",), True, False, None, None, b"text/plain"),
             ("foo.xml", (b"text/xml",), True, False, None, None, b"text/xml"),
             ("foo.html", (b"text/html",), True, False, None, None, b"text/html"),
-            (
-                "foo.gif",
-                (b"image/gif",),
-                True,
-                False,
-                None,
-                (b"image/gif",),
-                b"image/gif",
-            ),
-            (
-                "foo.mp4",
-                (b"video/mp4",),
-                True,
-                False,
-                None,
-                (b"video/mp4",),
-                b"video/mp4",
-            ),
-            (
-                b"GIF87a",
-                (b"image/gif",),
-                True,
-                False,
-                None,
-                (b"image/x-icon",),
-                b"image/gif",
-            ),
-            (
-                b"ID3",
-                (b"audio/mpeg",),
-                True,
-                False,
-                None,
-                (b"audio/basic",),
-                b"audio/mpeg",
-            ),
-            (
-                b"\x00\x00\x00\x00",
-                (b"text/test",),
-                True,
-                False,
-                None,
-                None,
-                b"text/test",
-            ),
-            (
-                b"",
-                (b"text/html; charset=utf-8",),
-                True,
-                False,
-                None,
-                None,
-                b"text/html",
-            ),
-            (
-                b"",
-                (b"text/htmlpdfthing",),
-                True,
-                False,
-                None,
-                None,
-                b"text/htmlpdfthing",
-            ),
+            ("foo.gif", (b"image/gif",), True, False, None, (b"image/gif",), b"image/gif"),
+            ("foo.mp4", (b"video/mp4",), True, False, None, (b"video/mp4",), b"video/mp4"),
+            (b"GIF87a", (b"image/gif",), True, False, None, (b"image/x-icon",), b"image/gif"),
+            (b"ID3", (b"audio/mpeg",), True, False, None, (b"audio/basic",), b"audio/mpeg"),
+            (b"\x00\x00\x00\x00", (b"text/test",), True, False, None, None, b"text/test"),
+            (b"", (b"text/html; charset=utf-8",), True, False, None, None, b"text/html"),
+            (b"", (b"text/htmlpdfthing",), True, False, None, None, b"text/htmlpdfthing"),
             (b"", None, True, False, None, None, b"text/plain"),
             (
                 b"test",
@@ -195,14 +139,7 @@ class TestMain:
         ],
     )
     def test_extract_mime(
-        self,
-        body,
-        content_types,
-        http_origin,
-        no_sniff,
-        extra_types,
-        supported_types,
-        expected,
+        self, body, content_types, http_origin, no_sniff, extra_types, supported_types, expected
     ):
         if isinstance(body, str):
             with open(f"tests/files/{body}", "rb") as input_file:
@@ -242,24 +179,14 @@ class TestMain:
             ("foo.zip", False, None, b"application/zip"),
             ("foo.txt", False, None, b"text/plain"),
             ("foo.exe", False, None, b"application/octet-stream"),
-            (
-                b"test",
-                False,
-                ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),),
-                b"text/test",
-            ),
+            (b"test", False, ((b"test", b"\xff\xff\xff\xff", None, b"text/test"),), b"text/test"),
         ],
     )
-    def test_find_unknown_mimetype(
-        self, input_bytes, sniff_scriptable, extra_types, expected
-    ):
+    def test_find_unknown_mimetype(self, input_bytes, sniff_scriptable, extra_types, expected):
         if isinstance(input_bytes, str):
             with open(f"tests/files/{input_bytes}", "rb") as input_file:
                 input_bytes = input_file.read()
-        assert (
-            _find_unknown_mimetype(input_bytes, sniff_scriptable, extra_types)
-            == expected
-        )
+        assert _find_unknown_mimetype(input_bytes, sniff_scriptable, extra_types) == expected
 
     @pytest.mark.parametrize(
         "input_bytes,supplied_type,expected",
@@ -277,16 +204,8 @@ class TestMain:
             (b"<!", None, None),
             (b"<?", None, None),
             (b"<rdf:RDF", None, None),
-            (
-                b"<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'",
-                None,
-                None,
-            ),
-            (
-                b"<rdf:RDF xmlns:content='http://purl.org/rss/1.0/modules/content/'",
-                None,
-                None,
-            ),
+            (b"<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'", None, None),
+            (b"<rdf:RDF xmlns:content='http://purl.org/rss/1.0/modules/content/'", None, None),
             (b"", None, None),
         ],
     )

@@ -9,11 +9,7 @@ from xtractmime._utils import (
     get_image_mime,
     get_text_mime,
 )
-from xtractmime.mimegroups import (
-    is_audio_video_mime_type,
-    is_html_mime_type,
-    is_image_mime_type,
-)
+from xtractmime.mimegroups import is_audio_video_mime_type, is_html_mime_type, is_image_mime_type
 
 RESOURCE_HEADER_BUFFER_LENGTH = 1445
 
@@ -60,10 +56,9 @@ def _find_unknown_mimetype(
 
 def _sniff_mislabled_binary(input_bytes: bytes) -> Optional[bytes]:
 
-    if input_bytes[:2] in (
-        bytes.fromhex("fe ff"),
-        bytes.fromhex("ff fe"),
-    ) or input_bytes[:3] == bytes.fromhex("ef bb bf"):
+    if input_bytes[:2] in (bytes.fromhex("fe ff"), bytes.fromhex("ff fe")) or input_bytes[
+        :3
+    ] == bytes.fromhex("ef bb bf"):
         return b"text/plain"
 
     if not is_binary_data(input_bytes):
@@ -181,10 +176,7 @@ def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[
                             if not input_bytes[index : index + 1]:
                                 return supplied_type
 
-                            if (
-                                input_bytes[index : index + 24]
-                                == b"http://purl.org/rss/1.0/"
-                            ):
+                            if input_bytes[index : index + 24] == b"http://purl.org/rss/1.0/":
                                 return b"application/rss+xml"
 
                             index += 1
@@ -223,9 +215,7 @@ def extract_mime(
     content_types: Optional[Tuple[bytes]] = None,
     http_origin: bool = True,
     no_sniff: bool = False,
-    extra_types: Optional[
-        Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]
-    ] = None,
+    extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]] = None,
     supported_types: Optional[Set[bytes]] = None,
 ) -> Optional[bytes]:
     extra_types = extra_types or tuple()
@@ -245,10 +235,7 @@ def extract_mime(
     if check_for_apache:
         return _sniff_mislabled_binary(resource_header)
 
-    if supplied_type.endswith(b"+xml") or supplied_type in {
-        b"text/xml",
-        b"application/xml",
-    }:
+    if supplied_type.endswith(b"+xml") or supplied_type in {b"text/xml", b"application/xml"}:
         return supplied_type
 
     if is_html_mime_type(supplied_type):

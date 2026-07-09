@@ -60,3 +60,6 @@ filename = "CHANGELOG.md"
 search = "\\(unreleased\\)$"
 replace = "({now:%Y-%m-%d})"
 regex = true
+
+[tool.ruff]
+line-length = 99
