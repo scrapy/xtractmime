@@ -1,7 +1,7 @@
 # xtractmime
 
 `xtractmime` is a [BSD-licensed](https://opensource.org/licenses/BSD-3-Clause)
-Python 3.7+ implementation of the [MIME Sniffing
+Python 3.10+ implementation of the [MIME Sniffing
 Standard](https://mimesniff.spec.whatwg.org/).
 
 Install from [`PyPI`](https://pypi.python.org/pypi/xtractmime):
@@ -16,7 +16,7 @@ pip install xtractmime
 
 Below mentioned are some simple examples of using `xtractmime.extract_mime`:
 
-```python
+```pycon
 >>> from xtractmime import extract_mime
 >>> extract_mime(b'Sample text content')
 b'text/plain'
@@ -27,7 +27,7 @@ b'text/html'
 Additional functionality to check if a MIME type belongs to a specific MIME type group using
 methods included in `xtractmime.mimegroups`:
 
-```python
+```pycon
 >>> from xtractmime.mimegroups import is_html_mime_type, is_image_mime_type
 >>> mime_type = b'text/html'
 >>> is_html_mime_type(mime_type)
@@ -109,7 +109,7 @@ xtractmime.mimegroups.is_xml_mime_type(mime_type: bytes) -> bool
 xtractmime.mimegroups.is_zip_mime_type(mime_type: bytes) -> bool
 ```
 **Example**
-```python
+```pycon
 >>> from xtractmime.mimegroups import is_html_mime_type, is_image_mime_type, is_zip_mime_type
 >>> mime_type = b'text/html'
 >>> is_html_mime_type(mime_type)
