@@ -10,7 +10,6 @@ from xtractmime import (
 
 
 class TestMain:
-
     sample_xml1 = b"""<?xml version = "1.0" encoding = "UTF-8" ?>
                         <!--Sample xml comment-->
                         <rss version="2.0">

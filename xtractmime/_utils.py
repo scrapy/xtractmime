@@ -1,5 +1,4 @@
 from struct import unpack
-from typing import Optional, Set, Tuple
 
 from xtractmime._patterns import (
     ARCHIVE_PATTERNS,
@@ -48,7 +47,7 @@ MP3_RATES = (
 
 
 def is_match_mime_pattern(
-    input_bytes: bytes, byte_pattern: bytes, pattern_mask: bytes, lstrip: Set[bytes] = None
+    input_bytes: bytes, byte_pattern: bytes, pattern_mask: bytes, lstrip: set[bytes] | None = None
 ) -> bool:
     input_size = len(input_bytes)
     pattern_size = len(byte_pattern)
@@ -185,13 +184,10 @@ def match_mp3_header(input_bytes: bytes, input_size: int, index: int) -> bool:
 
     final_layer = (input_bytes[index + 1] & 6) >> 1
 
-    if 4 - final_layer != 3:
-        return False
-
-    return True
+    return 4 - final_layer == 3
 
 
-def parse_mp3_frame(input_bytes: bytes) -> Tuple[int, int, int, int]:
+def parse_mp3_frame(input_bytes: bytes) -> tuple[int, int, int, int]:
     version = (input_bytes[1] & 24) >> 3
     bit_rate_index = (input_bytes[2] & 240) >> 4
 
@@ -254,13 +250,10 @@ def is_mp3_non_ID3_signature(input_bytes: bytes) -> bool:
 
     index += skipped_bytes
 
-    if match_mp3_header(input_bytes, input_size, index):
-        return True
-    else:
-        return False
+    return match_mp3_header(input_bytes, input_size, index)
 
 
-def get_image_mime(input_bytes: bytes) -> Optional[bytes]:
+def get_image_mime(input_bytes: bytes) -> bytes | None:
     for pattern in IMAGE_PATTERNS:
         if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
@@ -268,7 +261,7 @@ def get_image_mime(input_bytes: bytes) -> Optional[bytes]:
     return None
 
 
-def get_audio_video_mime(input_bytes: bytes) -> Optional[bytes]:
+def get_audio_video_mime(input_bytes: bytes) -> bytes | None:
     for pattern in AUDIO_VIDEO_PATTERNS:
         if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
@@ -285,7 +278,7 @@ def get_audio_video_mime(input_bytes: bytes) -> Optional[bytes]:
     return None
 
 
-def get_font_mime(input_bytes: bytes) -> Optional[bytes]:
+def get_font_mime(input_bytes: bytes) -> bytes | None:
     for pattern in FONT_PATTERNS:
         if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
@@ -293,7 +286,7 @@ def get_font_mime(input_bytes: bytes) -> Optional[bytes]:
     return None
 
 
-def get_archive_mime(input_bytes: bytes) -> Optional[bytes]:
+def get_archive_mime(input_bytes: bytes) -> bytes | None:
     for pattern in ARCHIVE_PATTERNS:
         if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
@@ -301,7 +294,7 @@ def get_archive_mime(input_bytes: bytes) -> Optional[bytes]:
     return None
 
 
-def get_text_mime(input_bytes: bytes) -> Optional[bytes]:
+def get_text_mime(input_bytes: bytes) -> bytes | None:
     for pattern in TEXT_PATTERNS:
         if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]
@@ -311,8 +304,8 @@ def get_text_mime(input_bytes: bytes) -> Optional[bytes]:
 
 def get_extra_mime(
     input_bytes: bytes,
-    extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]],
-) -> Optional[bytes]:
+    extra_types: tuple[tuple[bytes, bytes, set[bytes] | None, bytes], ...] | None,
+) -> bytes | None:
     for pattern in EXTRA_PATTERNS:
         if is_match_mime_pattern(input_bytes, pattern[0], pattern[1], pattern[2]):
             return pattern[3]

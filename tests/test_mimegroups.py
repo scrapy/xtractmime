@@ -2,7 +2,6 @@ import pytest
 
 from xtractmime import mimegroups
 
-
 ALL_MIME_GROUPS = {
     name[3:-10]: getattr(mimegroups, name)
     for name in dir(mimegroups)

@@ -1,10 +1,9 @@
 import os
+from unittest import mock
+
 import pytest
 
-from unittest import mock
-from xtractmime._utils import is_match_mime_pattern
 from xtractmime._patterns import WHITESPACE_BYTES
-
 from xtractmime._utils import (
     get_archive_mime,
     get_audio_video_mime,
@@ -12,6 +11,7 @@ from xtractmime._utils import (
     get_font_mime,
     get_image_mime,
     get_text_mime,
+    is_match_mime_pattern,
     is_mp3_non_ID3_signature,
     is_mp4_signature,
     is_webm_signature,
@@ -23,7 +23,6 @@ from xtractmime._utils import (
 
 
 class TestUtils:
-
     with open("tests/files/foo.webm", "rb") as fp:
         body_webm = fp.read()
 
@@ -66,7 +65,7 @@ class TestUtils:
     ):
         input_bytes = self.get_byte_seq(input_bytes)
         pattern_mask = bytes.fromhex(pattern_mask)
-        if type(expected) == type and issubclass(expected, Exception):
+        if type(expected) is type and issubclass(expected, Exception):
             with pytest.raises(expected):
                 is_match_mime_pattern(
                     input_bytes=input_bytes,
