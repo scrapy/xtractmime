@@ -1,8 +1,5 @@
-from typing import Optional, Set, Tuple
-
-
 #: Section 3
-#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#terminology  # noqa: E501
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#terminology
 BINARY_BYTES = tuple(
     bytes.fromhex(byte)
     for byte in (
@@ -38,7 +35,7 @@ BINARY_BYTES = tuple(
 WHITESPACE_BYTES = {b"\t", b"\r", bytes.fromhex("0c"), b"\n", b" "}
 
 #: Section 4.6
-#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#mime-type-groups  # noqa: E501
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#mime-type-groups
 FONT_TYPES = [
     b"application/font-cff",
     b"application/font-off",
@@ -73,7 +70,7 @@ JAVASCRIPT_TYPES = [
 ]
 
 #: Section 5.1, step 2
-#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#interpreting-the-resource-metadata  # noqa: E501
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#interpreting-the-resource-metadata
 _APACHE_TYPES = [
     b"text/plain",
     b"text/plain; charset=ISO-8859-1",
@@ -82,7 +79,7 @@ _APACHE_TYPES = [
 ]
 
 #: Section 6.1, step 1
-#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-image-type-pattern  # noqa: E501
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-image-type-pattern
 IMAGE_PATTERNS = (
     (bytes.fromhex("00000100"), bytes.fromhex("ffffffff"), None, b"image/x-icon"),
     (bytes.fromhex("00000200"), bytes.fromhex("ffffffff"), None, b"image/x-icon"),
@@ -120,7 +117,7 @@ IMAGE_PATTERNS = (
 )
 
 #: Section 6.2, step 1
-#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-audio-or-video-type-pattern  # noqa: E501
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-audio-or-video-type-pattern
 AUDIO_VIDEO_PATTERNS = (
     (
         b".snd",
@@ -167,7 +164,7 @@ AUDIO_VIDEO_PATTERNS = (
 )
 
 #: Section 6.3, step 1
-#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-a-font-type-pattern  # noqa: E501
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-a-font-type-pattern
 FONT_PATTERNS = (
     (
         (
@@ -210,7 +207,7 @@ FONT_PATTERNS = (
 )
 
 #: Section 6.4, step 1
-#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-archive-type-pattern  # noqa: E501
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#matching-an-archive-type-pattern
 ARCHIVE_PATTERNS = (
     (bytes.fromhex("1f8b08"), bytes.fromhex("ffffff"), None, b"application/x-gzip"),
     (
@@ -228,7 +225,7 @@ ARCHIVE_PATTERNS = (
 )
 
 #: Section 7.1, step 1
-#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type
 TEXT_PATTERNS = tuple(
     (prefix + suffix, bytes.fromhex(mask), WHITESPACE_BYTES, b"text/html")
     for prefix, mask in (
@@ -257,8 +254,8 @@ TEXT_PATTERNS = tuple(
 )
 
 #: Section 7.1, step 2
-#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type  # noqa: E501
-EXTRA_PATTERNS: Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...] = (
+#: https://mimesniff.spec.whatwg.org/commit-snapshots/609a3a3c935fbb805b46cf3d90768d695a1dcff2/#identifying-a-resource-with-an-unknown-mime-type
+EXTRA_PATTERNS: tuple[tuple[bytes, bytes, set[bytes] | None, bytes], ...] = (
     (
         b"%!PS-Adobe-",
         bytes.fromhex("ffffffffffffffffffffff"),

@@ -63,3 +63,6 @@ regex = true
 
 [tool.ruff]
 line-length = 99
+
+[tool.ruff.lint.per-file-ignores]
+"tests/test_mimegroups.py" = ["PT014"]

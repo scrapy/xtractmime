@@ -1,6 +1,6 @@
 __version__ = "0.2.1"
 import re
-from typing import Optional, Set, Tuple
+
 from xtractmime._patterns import _APACHE_TYPES, BINARY_BYTES, WHITESPACE_BYTES
 from xtractmime._utils import (
     get_archive_mime,
@@ -25,8 +25,8 @@ def is_binary_data(input_bytes: bytes) -> bool:
 def _find_unknown_mimetype(
     input_bytes: bytes,
     sniff_scriptable: bool,
-    extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]],
-) -> Optional[bytes]:
+    extra_types: tuple[tuple[bytes, bytes, set[bytes] | None, bytes], ...] | None,
+) -> bytes | None:
     if sniff_scriptable:
         matched_type = get_text_mime(input_bytes)
         if matched_type:
@@ -54,7 +54,7 @@ def _find_unknown_mimetype(
     return b"application/octet-stream"
 
 
-def _sniff_mislabled_binary(input_bytes: bytes) -> Optional[bytes]:
+def _sniff_mislabled_binary(input_bytes: bytes) -> bytes | None:
 
     if input_bytes[:2] in (bytes.fromhex("fe ff"), bytes.fromhex("ff fe")) or input_bytes[
         :3
@@ -67,7 +67,7 @@ def _sniff_mislabled_binary(input_bytes: bytes) -> Optional[bytes]:
     return b"application/octet-stream"
 
 
-def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> Optional[bytes]:
+def _sniff_mislabled_feed(input_bytes: bytes, supplied_type: bytes) -> bytes | None:
     input_size = len(input_bytes)
     index = 0
 
@@ -204,27 +204,25 @@ def _is_valid_mime_type(mime_type):
     if not re.match(_TOKEN, _type):
         return False
     subtype = subtype_and_params.split(b";", maxsplit=1)[0]
-    if not re.match(_TOKEN, subtype):
-        return False
-    return True
+    return re.match(_TOKEN, subtype) is not None
 
 
 def extract_mime(
     body: bytes,
     *,
-    content_types: Optional[Tuple[bytes]] = None,
+    content_types: tuple[bytes] | None = None,
     http_origin: bool = True,
     no_sniff: bool = False,
-    extra_types: Optional[Tuple[Tuple[bytes, bytes, Optional[Set[bytes]], bytes], ...]] = None,
-    supported_types: Optional[Set[bytes]] = None,
-) -> Optional[bytes]:
-    extra_types = extra_types or tuple()
+    extra_types: tuple[tuple[bytes, bytes, set[bytes] | None, bytes], ...] | None = None,
+    supported_types: set[bytes] | None = None,
+) -> bytes | None:
+    extra_types = extra_types or ()
     supplied_type = content_types[-1] if content_types else b""
     check_for_apache = http_origin and supplied_type in _APACHE_TYPES
     if not _is_valid_mime_type(supplied_type):
         supplied_type = b""
     supplied_type = supplied_type.split(b";")[0].strip().lower()
-    resource_header = memoryview(body)[:RESOURCE_HEADER_BUFFER_LENGTH]
+    resource_header = body[:RESOURCE_HEADER_BUFFER_LENGTH]
 
     if supplied_type in (b"", b"unknown/unknown", b"application/unknown", b"*/*"):
         return _find_unknown_mimetype(resource_header, not no_sniff, extra_types)

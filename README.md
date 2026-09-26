@@ -18,9 +18,9 @@ Below mentioned are some simple examples of using `xtractmime.extract_mime`:
 
 ```pycon
 >>> from xtractmime import extract_mime
->>> extract_mime(b'Sample text content')
+>>> extract_mime(b"Sample text content")
 b'text/plain'
->>> extract_mime(b'', content_types=(b'text/html',))
+>>> extract_mime(b"", content_types=(b"text/html",))
 b'text/html'
 ```
 
@@ -29,7 +29,7 @@ methods included in `xtractmime.mimegroups`:
 
 ```pycon
 >>> from xtractmime.mimegroups import is_html_mime_type, is_image_mime_type
->>> mime_type = b'text/html'
+>>> mime_type = b"text/html"
 >>> is_html_mime_type(mime_type)
 True
 >>> is_image_mime_type(mime_type)
@@ -74,7 +74,7 @@ this parameter to *`True`* if the [`X-Content-Type-Options`](https://developer.m
 
 **Sample `extra_types`:**
 ```python
-extra_types = ((b'test', b'\xff\xff\xff\xff', None, b'text/test'), ...)
+extra_types = ((b"test", b"\xff\xff\xff\xff", None, b"text/test"), ...)
 ```
 
 ---
@@ -111,7 +111,7 @@ xtractmime.mimegroups.is_zip_mime_type(mime_type: bytes) -> bool
 **Example**
 ```pycon
 >>> from xtractmime.mimegroups import is_html_mime_type, is_image_mime_type, is_zip_mime_type
->>> mime_type = b'text/html'
+>>> mime_type = b"text/html"
 >>> is_html_mime_type(mime_type)
 True
 >>> is_image_mime_type(mime_type)
